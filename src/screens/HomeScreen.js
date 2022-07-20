@@ -70,7 +70,10 @@ const HomeScreen = ({ navigation }) => {
               data={data}
               withInnerLines={false}
               withDot={false}
-              style={{ borderRadius: 20 }}
+              style={{
+                // marginVertical: 8,
+                borderRadius: 20,
+              }}
               width={Dimensions.get("window").width - 40}
               height={256}
               verticalLabelRotation={30}

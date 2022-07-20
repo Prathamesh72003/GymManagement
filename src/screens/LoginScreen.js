@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,36 +8,40 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-} from 'react-native';
-import FontAwsome5 from 'react-native-vector-icons/FontAwesome5';
-import {TextInput, Button} from 'react-native-paper';
+} from "react-native";
+import FontAwsome5 from "react-native-vector-icons/FontAwesome5";
+import { TextInput, Button } from "react-native-paper";
 
-const {width, height} = Dimensions.get('window');
-const LoginScreen = ({navigation}) => {
+const { width, height } = Dimensions.get("window");
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   return (
     <ScrollView>
       <View style={styles.container}>
         <ImageBackground
-          source={require('../assets/background.png')}
-          style={{height: height / 2.5}}>
+          source={require("../assets/background.png")}
+          style={{ height: height / 2.5 }}
+        >
           <View style={styles.UpperContainer}>
             <Text style={styles.BrandText}>GYM BOOK</Text>
           </View>
         </ImageBackground>
         <View style={styles.bottomContainer}>
-          <View style={{padding: 30}}>
+          <View style={{ padding: 30 }}>
             <Text style={styles.WelcomeText}>Welcome</Text>
-            <View style={{display: 'flex', flexDirection: 'row', marginTop: 5}}>
+            <View
+              style={{ display: "flex", flexDirection: "row", marginTop: 5 }}
+            >
               <Text style={styles.RegisterText}>Don't have an account? </Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate('SignUp')}
+                onPress={() => navigation.navigate("SignUp")}
                 style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <Text style={styles.RegisterSub}>Register Now</Text>
               </TouchableOpacity>
             </View>
@@ -45,54 +49,66 @@ const LoginScreen = ({navigation}) => {
               <TextInput
                 style={styles.inputContainer}
                 label="Email"
-                activeOutlineColor='#2F50C9'
+                activeOutlineColor="#2F50C9"
                 value={email}
-                onChangeText={text => setEmail(text)}
+                onChangeText={(text) => setEmail(text)}
                 mode="outlined"
               />
               <TextInput
                 style={styles.inputContainer}
                 label="Password"
-                activeOutlineColor='#2F50C9'
+                activeOutlineColor="#2F50C9"
                 secureTextEntry={true}
                 value={password}
-                onChangeText={text => setPassword(text)}
+                onChangeText={(text) => setPassword(text)}
                 mode="outlined"
               />
               <View style={styles.forgotPassword}>
                 <View
                   style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
                   <Text
-                    style={{fontSize: 15, fontWeight: 'bold', color: '#000'}}>
+                    style={{ fontSize: 15, fontWeight: "bold", color: "#000" }}
+                  >
                     Forgot Password?
                   </Text>
                 </View>
                 <TouchableOpacity
-                  style={{width: '30%'}}
+                  style={{ width: "30%" }}
                   // icon="camera"
                   mode="outlined"
-                  onPress={() => navigation.navigate('ForgotPass')}>
-                  <Text style={{color: '#2F50C9', textAlign: "center", fontWeight: "bold", fontSize: 15}}>Reset</Text>
+                  onPress={() => navigation.navigate("ForgotPass")}
+                >
+                  <Text
+                    style={{
+                      color: "#2F50C9",
+                      textAlign: "center",
+                      fontWeight: "bold",
+                      fontSize: 15,
+                    }}
+                  >
+                    Reset
+                  </Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.loginBtnContainer}>
                 <Button
                   style={{
-                    width: '60%',
+                    width: "60%",
                     borderRadius: 30,
                     elevation: 5,
-                    backgroundColor: '#2F50C9',
+                    backgroundColor: "#2F50C9",
                   }}
                   mode="contained"
-                  onPress={() => navigation.replace('Home')}>
+                  onPress={() => navigation.replace("Home")}
+                >
                   Login
                 </Button>
               </View>
-              
             </View>
           </View>
         </View>
@@ -105,44 +121,44 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    display: 'flex',
+    backgroundColor: "#fff",
+    display: "flex",
     // justifyContent: 'center',
     // alignItems: "center",
     flex: 1,
   },
   UpperContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     flex: 1,
     // marginTop:
   },
   BrandText: {
     marginTop: 10,
     fontSize: 30,
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   bottomContainer: {
     flex: 1.5,
     bottom: 60,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderTopStartRadius: 60,
     borderTopEndRadius: 60,
   },
   WelcomeText: {
     fontSize: 30,
-    color: '#2F50C9',
-    fontWeight: 'bold',
+    color: "#2F50C9",
+    fontWeight: "bold",
   },
   RegisterText: {
     fontSize: 15,
-    color: '#000',
+    color: "#000",
   },
   RegisterSub: {
     fontSize: 15,
-    color: '#2F50C9',
+    color: "#2F50C9",
   },
   formContainer: {
     marginTop: 20,
@@ -151,21 +167,21 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   forgotPassword: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   loginBtnContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 30,
     // marginBottom: 30,
   },
   otherLoginConatiner: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
   },
 });

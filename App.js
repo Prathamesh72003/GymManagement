@@ -18,6 +18,7 @@ import Subscription from "./src/screens/Subscription";
 import Plans from "./src/screens/Plans";
 import Services from "./src/screens/Services";
 import AddMember from "./src/screens/AddMember";
+import Collections from "./src/screens/Collections";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -67,6 +68,17 @@ const TabNavi = ({ navigation }) => {
         options={{
           headerShown: false,
           tabBarIcon: ({ color }) => {
+            return <FontAwesome5 name="rupee-sign" size={22} color={color} />;
+          },
+        }}
+        name="Collections"
+        component={Collections}
+      />
+
+      <Tab.Screen
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color }) => {
             return <FontAwesome5 name="user" size={22} color={color} />;
           },
         }}
@@ -80,7 +92,7 @@ const TabNavi = ({ navigation }) => {
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="AddMember">
+      <Stack.Navigator initialRouteName="Splash">
         <Stack.Screen
           options={{ headerShown: false }}
           name="Splash"
