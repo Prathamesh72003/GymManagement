@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   cardTextBold: {
     paddingTop: 10,
-    fontSize: 25,
+    fontSize: 22,
     fontWeight: "700",
   },
 });

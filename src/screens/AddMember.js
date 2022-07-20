@@ -9,6 +9,7 @@ import React, { useState } from "react";
 
 import { TextInput, RadioButton } from "react-native-paper";
 import { Dropdown } from "react-native-element-dropdown";
+import DatePicker from "react-native-datepicker";
 
 const plans = [
   {
@@ -36,6 +37,7 @@ const AddMember = () => {
   const [phoneNO, setPhoneNO] = useState();
   const [emailID, setEmailID] = useState();
   const [gender, setGender] = useState("male");
+  const [joiningDate, setJoiningDate] = useState("2022-07-20");
   const [selectedPlan, setSelectedPlan] = useState(plans[0]);
   const [isFocus, setIsFocus] = useState(false);
 
@@ -111,6 +113,36 @@ const AddMember = () => {
                 onPress={() => setGender("female")}
               />
               <Text>Female</Text>
+            </View>
+
+            <View style={styles.row}>
+              <DatePicker
+                style={{ width: 200 }}
+                date={joiningDate}
+                mode="date"
+                placeholder="select date"
+                format="YYYY-MM-DD"
+                minDate="2022-06-01"
+                maxDate="2022-08-01"
+                confirmBtnText="Confirm"
+                cancelBtnText="Cancel"
+                customStyles={{
+                  dateIcon: {
+                    position: "absolute",
+                    left: 0,
+                    top: 4,
+                    marginLeft: 0,
+                  },
+                  dateInput: {
+                    marginLeft: 36,
+                    width: "100%",
+                  },
+                  // ... You can check the source to find the other keys.
+                }}
+                onDateChange={(date) => {
+                  setJoiningDate(date);
+                }}
+              />
             </View>
           </View>
         </View>
@@ -257,7 +289,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonContainer: {
-    padding: 15,
+    padding: 10,
     margin: 20,
     display: "flex",
     justifyContent: "center",

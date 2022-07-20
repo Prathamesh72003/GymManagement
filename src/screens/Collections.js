@@ -196,16 +196,6 @@ const Collections = () => {
     ];
   }, []);
 
-  const getPlanDetails = (id) => {
-    var data;
-    plansSelectedTable.map((item) => {
-      if (item.id == id) {
-        data = item;
-      }
-    });
-    return data;
-  };
-
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
@@ -213,17 +203,19 @@ const Collections = () => {
         <View style={styles.block}>
           <Text style={styles.blockTitle}>Overall collection</Text>
           <View style={styles.blockDivider} />
-          <PieChart
-            data={pie_chart_data.data}
-            width={Dimensions.get("window").width - 40}
-            height={220}
-            chartConfig={chartConfig}
-            accessor={"amount"}
-            backgroundColor={"transparent"}
-            paddingLeft={"0"}
-            center={[0, 0]}
-            absolute
-          />
+          {pie_chart_data.data != null ? (
+            <PieChart
+              data={pie_chart_data.data}
+              width={Dimensions.get("window").width - 40}
+              height={220}
+              chartConfig={chartConfig}
+              accessor={"amount"}
+              backgroundColor={"transparent"}
+              paddingLeft={"0"}
+              center={[0, 0]}
+              absolute
+            />
+          ) : null}
         </View>
 
         {/* member plan collection block */}
@@ -417,6 +409,7 @@ const Collections = () => {
             </View>
           </View>
         </View>
+        <View style={{ marginBottom: 80 }}></View>
       </View>
     </ScrollView>
   );
@@ -441,7 +434,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   blockTitle: {
-    fontSize: 18,
+    fontSize: 20,
+    color: "#2f50c9",
     fontWeight: "bold",
   },
   blockDivider: {

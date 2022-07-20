@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#2f50c9",
   },
   header: {
-    backgroundColor: "#14213D",
+    backgroundColor: "#2f50c9",
     // backgroundColor: '#04080F',
     padding: 20,
     paddingTop: 30,
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
     backgroundColor: "#fff",
+    marginBottom: 80,
   },
   row: {
     flexDirection: "row",

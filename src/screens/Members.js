@@ -30,7 +30,7 @@ const data = [
   },
 ];
 
-const Members = (props) => {
+const Members = ({ navigation }) => {
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -46,7 +46,7 @@ const Members = (props) => {
             color={"#fff"}
             icon="plus"
             style={styles.fab}
-            onPress={() => console.log("Pressed")}
+            onPress={() => navigation.navigate("AddMember")}
           />
         </View>
       </Provider>

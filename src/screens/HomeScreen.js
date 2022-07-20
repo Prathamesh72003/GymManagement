@@ -42,8 +42,8 @@ const chartConfig = {
 
 const HomeScreen = ({ navigation }) => {
   return (
-    <View styles={styles.container}>
-      <ScrollView>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <View styles={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Universal GYM</Text>
         </View>
@@ -82,8 +82,8 @@ const HomeScreen = ({ navigation }) => {
             />
           </View>
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -114,6 +114,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
     backgroundColor: "#fff",
+    marginBottom: 80,
   },
   row: {
     flexDirection: "row",

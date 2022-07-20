@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
 import React from "react";
 import LottieView from "lottie-react-native";
 
@@ -12,15 +12,21 @@ const SplashScreen = ({ navigation }) => {
       <LottieView
         source={require("../assets/splash.json")}
         autoPlay
-        style={{ width: "100%", height: "100%" }}
-        loop
+        resizeMode="cover"
+        style={{
+          // width: Dimensions.get("window").width,
+          // height: Dimensions.get("window").height,
+          display: "flex",
+          flexGrow: 1,
+        }}
+        loop={false}
       />
 
       <LottieView
         source={require("../assets/watersplash.json")}
         autoPlay
         style={{ position: "absolute", width: 350, height: 350 }}
-        loop
+        loop={false}
       />
       <Image
         style={styles.AppName}
@@ -35,10 +41,11 @@ export default SplashScreen;
 const styles = StyleSheet.create({
   containerr: {
     display: "flex",
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
     height: "100%",
+    width: "100%",
   },
 
   AppName: {

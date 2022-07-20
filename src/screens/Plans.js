@@ -27,7 +27,7 @@ const data = [
   },
 ];
 
-const Plans = () => {
+const Plans = ({ navigation }) => {
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -42,7 +42,7 @@ const Plans = () => {
           color={"#fff"}
           icon="plus"
           style={styles.fab}
-          onPress={() => console.log("Pressed")}
+          onPress={() => navigation.navigate("AddPlan")}
         />
       </View>
     </ScrollView>

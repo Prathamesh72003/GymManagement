@@ -31,14 +31,14 @@ const TabNavi = ({ navigation }) => {
         tabBarActiveTintColor: "#fff",
         tabBarShowLabel: false,
         tabBarStyle: {
-          // position: 'absolute',
-          // bottom: 25,
-          // left: 20,
-          // right: 20,
-          // elevation: 8,
-          backgroundColor: "#344955",
-          // borderRadius: 15,
-          // height: 60,
+          position: "absolute",
+          bottom: 20,
+          left: 20,
+          right: 20,
+          elevation: 8,
+          backgroundColor: "#2f50c9",
+          borderRadius: 35,
+          height: 60,
         },
       }}
     >
