@@ -5,143 +5,240 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar } from "react-native-paper";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
 
 const ProfileScreen = ({ navigation }) => {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState("");
+  const [gymname, setGymname] = useState("");
+  const [ownername, setOwnername] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [totalServices, setTotalServices] = useState("");
+  const [totalPlans, setTotalPlans] = useState("");
+
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
+  if (initializing) return null;
+
+  if (!user) {
+    return navigation.replace("Login");
+  }
+
+  firestore()
+    .collection("GYM")
+    .doc(user.email)
+    .get()
+    .then((documentSnapshot) => {
+      if (documentSnapshot.exists) {
+        // console.log('User data: ', documentSnapshot.data());
+        setGymname(documentSnapshot.data().gymname);
+        setOwnername(documentSnapshot.data().owner);
+        setPhone(documentSnapshot.data().phone);
+        setEmail(documentSnapshot.data().email);
+      }
+    });
+
+  firestore()
+    .collection("GYM")
+    .doc(user.email)
+    .collection("SERVICES")
+    .get()
+    .then((querySnapshot) => {
+      setTotalServices(querySnapshot.size);
+    });
+  firestore()
+    .collection("GYM")
+    .doc(user.email)
+    .collection("PLANS")
+    .get()
+    .then((querySnapshot) => {
+      setTotalPlans(querySnapshot.size);
+    });
   return (
     <ScrollView>
-      <View style={styles.mainconatiner}>
-        <View style={styles.upperConatiner}>
-          <View style={styles.ImageNdName}>
-            <Avatar.Image
-              style={styles.avatar}
-              size={65}
-              source={require("../assets/user.png")}
-            />
-            <View style={styles.TileSubtitle}>
-              <Text style={styles.GymName}>Universal Gym</Text>
-              <Text style={styles.OwnerName}>Prathamesh</Text>
-            </View>
-          </View>
-          <View style={styles.contactInfo}>
-            <View style={styles.contactCard}>
-              <FontAwesome5
-                style={styles.contactSymbol}
-                name="phone"
-                size={20}
-                color={"#000"}
-              />
-              <Text style={styles.phoneNumber}>9112272004</Text>
-            </View>
-            <View style={styles.contactCard}>
-              <FontAwesome5
-                style={styles.contactSymbol}
-                name="envelope"
-                size={20}
-                color={"#000"}
-              />
-              <Text style={styles.emailId}>universal@gmail.com</Text>
-            </View>
-          </View>
+      <View styles={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Profile</Text>
         </View>
-
-        <View style={styles.middleContainer}>
-          <View style={styles.components}>
-            <TouchableOpacity>
-              <View style={styles.card}>
-                <Text
-                  style={{ fontSize: 22, fontWeight: "bold", color: "#2f50c9" }}
-                >
-                  102
-                </Text>
-                <Text style={styles.componentText}>Members</Text>
+        <View style={styles.body}>
+          <View style={styles.upperConatiner}>
+            <View style={styles.ImageNdName}>
+              <Avatar.Image
+                style={styles.avatar}
+                size={65}
+                source={require("../assets/user.png")}
+              />
+              <View style={styles.TileSubtitle}>
+                <Text style={styles.GymName}>{gymname + " Fitness"}</Text>
+                <Text style={styles.OwnerName}>{ownername}</Text>
               </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity>
-              <View style={styles.card}>
-                <Text
-                  style={{ fontSize: 22, fontWeight: "bold", color: "#2f50c9" }}
-                >
-                  12
-                </Text>
-                <Text style={styles.componentText}>Plans</Text>
+            </View>
+            <View style={styles.contactInfo}>
+              <View style={styles.contactCard}>
+                <FontAwesome5
+                  style={styles.contactSymbol}
+                  name="phone"
+                  size={20}
+                  color={"#000"}
+                />
+                <Text style={styles.phoneNumber}>{phone}</Text>
               </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity>
-              <View style={styles.card}>
-                <Text
-                  style={{ fontSize: 22, fontWeight: "bold", color: "#2f50c9" }}
-                >
-                  20
-                </Text>
-                <Text style={styles.componentText}>Services</Text>
+              <View style={styles.contactCard}>
+                <FontAwesome5
+                  style={styles.contactSymbol}
+                  name="envelope"
+                  size={20}
+                  color={"#000"}
+                />
+                <Text style={styles.emailId}>{email}</Text>
               </View>
-            </TouchableOpacity>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.LowerContainer}>
-          <View style={styles.TabList}>
-            <TouchableOpacity>
-              <View style={styles.listItem}>
-                <View style={styles.Icon}>
-                  <FontAwesome5 name="download" size={22} color={"#2f50c9"} />
-                </View>
-                <View style={styles.ListTextContainer}>
-                  <Text style={styles.ListText}>Download members list</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View style={styles.listItem}>
-                <View style={styles.Icon}>
-                  <FontAwesome5 name="bullhorn" size={22} color={"#2f50c9"} />
-                </View>
-                <View style={styles.ListTextContainer}>
-                  <Text style={styles.ListText}>Tell a friend</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("Subscription");
-              }}
-            >
-              <View style={styles.listItem}>
-                <View style={styles.Icon}>
-                  <FontAwesome5 name="wallet" size={22} color={"#2f50c9"} />
-                </View>
-                <View style={styles.ListTextContainer}>
-                  <Text style={styles.ListText}>Upgrade subscription</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View style={styles.listItem}>
-                <View style={styles.Icon}>
-                  <FontAwesome5 name="question" size={22} color={"#2f50c9"} />
-                </View>
-                <View style={styles.ListTextContainer}>
-                  <Text style={styles.ListText}>How to use gymbook</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View style={styles.listItem}>
-                <View style={styles.Icon}>
-                  <FontAwesome5 name="info" size={22} color={"#2f50c9"} />
-                </View>
-                <View style={styles.ListTextContainer}>
-                  <Text style={styles.ListText}>
-                    FAQ ( issues and queries )
+          <View style={styles.middleContainer}>
+            <View style={styles.components}>
+              <TouchableOpacity>
+                <View style={styles.card}>
+                  <Text
+                    style={{
+                      fontSize: 22,
+                      fontWeight: "bold",
+                      color: "#2f50c9",
+                    }}
+                  >
+                    102
                   </Text>
+                  <Text style={styles.componentText}>Members</Text>
                 </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+
+              <TouchableOpacity>
+                <View style={styles.card}>
+                  <Text
+                    style={{
+                      fontSize: 22,
+                      fontWeight: "bold",
+                      color: "#2f50c9",
+                    }}
+                  >
+                    {totalPlans}
+                  </Text>
+                  <Text style={styles.componentText}>Plans</Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity>
+                <View style={styles.card}>
+                  <Text
+                    style={{
+                      fontSize: 22,
+                      fontWeight: "bold",
+                      color: "#2f50c9",
+                    }}
+                  >
+                    {totalServices}
+                  </Text>
+                  <Text style={styles.componentText}>Services</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.LowerContainer}>
+            <View style={styles.TabList}>
+              <TouchableOpacity>
+                <View style={styles.listItem}>
+                  <View style={styles.Icon}>
+                    <FontAwesome5 name="download" size={22} color={"#2f50c9"} />
+                  </View>
+                  <View style={styles.ListTextContainer}>
+                    <Text style={styles.ListText}>Download members list</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <View style={styles.listItem}>
+                  <View style={styles.Icon}>
+                    <FontAwesome5 name="bullhorn" size={22} color={"#2f50c9"} />
+                  </View>
+                  <View style={styles.ListTextContainer}>
+                    <Text style={styles.ListText}>Tell a friend</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Subscription");
+                }}
+              >
+                <View style={styles.listItem}>
+                  <View style={styles.Icon}>
+                    <FontAwesome5 name="wallet" size={22} color={"#2f50c9"} />
+                  </View>
+                  <View style={styles.ListTextContainer}>
+                    <Text style={styles.ListText}>Upgrade subscription</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <View style={styles.listItem}>
+                  <View style={styles.Icon}>
+                    <FontAwesome5 name="question" size={22} color={"#2f50c9"} />
+                  </View>
+                  <View style={styles.ListTextContainer}>
+                    <Text style={styles.ListText}>How to use gymbook</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <View style={styles.listItem}>
+                  <View style={styles.Icon}>
+                    <FontAwesome5 name="info" size={22} color={"#2f50c9"} />
+                  </View>
+                  <View style={styles.ListTextContainer}>
+                    <Text style={styles.ListText}>
+                      FAQ ( issues and queries )
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  auth()
+                    .signOut()
+                    .then(() => {
+                      // console.log('done');
+                      navigation.replace("Login");
+                    });
+                }}
+              >
+                <View style={styles.listItem}>
+                  <View style={styles.Icon}>
+                    <FontAwesome5
+                      name="sign-out-alt"
+                      size={22}
+                      color={"#2f50c9"}
+                    />
+                  </View>
+                  <View style={styles.ListTextContainer}>
+                    <Text style={styles.ListText}>Logout</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -152,10 +249,29 @@ const ProfileScreen = ({ navigation }) => {
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
-  mainconatiner: {
+  container: {
+    flex: 1,
+    backgroundColor: "#2f50c9",
+  },
+  header: {
+    backgroundColor: "#2f50c9",
+    // backgroundColor: '#04080F',
+    padding: 20,
+    paddingTop: 30,
+    paddingBottom: 60,
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 25,
+    fontWeight: "600",
+  },
+  body: {
     height: "100%",
-    width: "100%",
-    backgroundColor: "white",
+    marginTop: -30,
+    overflow: "hidden",
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
+    backgroundColor: "#fff",
   },
   upperConatiner: {
     padding: 20,

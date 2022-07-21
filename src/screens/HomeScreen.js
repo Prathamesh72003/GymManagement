@@ -6,10 +6,12 @@ import {
   View,
   ScrollView,
 } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Card from "../components/Card";
 
 import { LineChart } from "react-native-chart-kit";
+import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
 
 const data = {
   labels: ["January", "February", "March", "April", "May", "June"],
@@ -41,6 +43,43 @@ const chartConfig = {
 };
 
 const HomeScreen = ({ navigation }) => {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState("");
+  const [totalServices, setTotalServices] = useState("");
+  const [totalPlans, setTotalPlans] = useState("");
+
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
+  if (initializing) return null;
+
+  if (!user) {
+    return navigation.replace("Login");
+  }
+
+  firestore()
+    .collection("GYM")
+    .doc(user.email)
+    .collection("SERVICES")
+    .get()
+    .then((querySnapshot) => {
+      setTotalServices(querySnapshot.size);
+    });
+  firestore()
+    .collection("GYM")
+    .doc(user.email)
+    .collection("PLANS")
+    .get()
+    .then((querySnapshot) => {
+      setTotalPlans(querySnapshot.size);
+    });
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View styles={styles.container}>
@@ -57,10 +96,10 @@ const HomeScreen = ({ navigation }) => {
             />
           </View>
           <View style={styles.row}>
-            <Card width={"45%"} count={3} title={"Plans"} intent={"Plans"} />
+            <Card width={"45%"} count={totalPlans} title={"Plans"} intent={"Plans"} />
             <Card
               width={"45%"}
-              count={2}
+              count={totalServices}
               title={"Services"}
               intent={"Services"}
             />

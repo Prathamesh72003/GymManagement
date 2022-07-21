@@ -4,15 +4,59 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  ToastAndroid
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 
 import { TextInput, RadioButton } from "react-native-paper";
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const AddService = () => {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [amount, setAmount] = useState();
+  
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
 
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
+  if (initializing) return null;
+
+  if (!user) {
+    return navigation.replace('Login');
+  }
+
+  const AddServiceToDb = async () => {
+    if (serviceName.length == 0 && amount.length == 0) {
+      ToastAndroid.show(
+        'All fields required',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    }else{
+      await firestore().collection('GYM').doc(user.email).collection('SERVICES').doc(serviceName).set({
+        service: serviceName,
+        amount: amount,
+      }).then(()=>{
+        console.log("Service added to firebase");
+        setServiceName("");
+        setAmount("");
+      })
+      ToastAndroid.show(
+        'Service added successfully!',
+        ToastAndroid.LONG,
+        ToastAndroid.CENTER,
+      );
+    }
+  }
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
@@ -36,7 +80,7 @@ const AddService = () => {
           />
         </View>
         <View style={styles.formBottom}>
-          <TouchableOpacity style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.buttonContainer} onPress={() => AddServiceToDb()}>
             <Text style={styles.buttonText}>Add service</Text>
           </TouchableOpacity>
         </View>

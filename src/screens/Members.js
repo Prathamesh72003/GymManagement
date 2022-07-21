@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   body: {
     height: "100%",
     padding: 20,
-    backgroundColor: "#E0E3E9",
+    backgroundColor: "#fff",
   },
   fab: {
     position: "absolute",

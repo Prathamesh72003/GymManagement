@@ -4,11 +4,14 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  ToastAndroid
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 
 import { TextInput, RadioButton } from "react-native-paper";
 import { Dropdown } from "react-native-element-dropdown";
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const data = [
   { label: "1 month", value: "1" },
@@ -22,12 +25,55 @@ const data = [
 ];
 
 const AddPlan = () => {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState("");
   const [planName, setPlanName] = useState("");
   const [amount, setAmount] = useState();
   const [durationType, setDurationType] = useState("Month");
   const [days, setDays] = useState();
   const [months, setMonths] = useState();
   const [isFocus, setIsFocus] = useState(false);
+
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
+  if (initializing) return null;
+
+  if (!user) {
+    return navigation.replace('Login');
+  }
+
+  const AddPlanToDb = async () => {
+    if (planName.length == 0 && amount.length == 0 && durationType.length == 0 && days.length == 0 || months.length == 0) {
+      ToastAndroid.show(
+        'All fields required',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    }else{
+      await firestore().collection('GYM').doc(user.email).collection('PLANS').doc(planName).set({
+        plan: planName,
+        amount: amount,
+        durationType: durationType,
+        // days: days,
+        months: months,
+      }).then(()=>{
+        console.log("Plan added to firebase");
+      })
+      ToastAndroid.show(
+        'Plan added successfully!',
+        ToastAndroid.LONG,
+        ToastAndroid.CENTER,
+      );
+    }
+  }
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -101,7 +147,7 @@ const AddPlan = () => {
           )}
         </View>
         <View style={styles.formBottom}>
-          <TouchableOpacity style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.buttonContainer} onPress={() => AddPlanToDb()}>
             <Text style={styles.buttonText}>Add plan</Text>
           </TouchableOpacity>
         </View>

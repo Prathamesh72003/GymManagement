@@ -9,7 +9,7 @@ const ServiceCard = props => {
       <View>
         <Text style={styles.text} numberOfLines={1}>
           <Text style={styles.textBold}>Service name: </Text>
-          {props.data.name}
+          {props.data.service}
         </Text>
         <Text style={styles.text} numberOfLines={1}>
           <Text style={styles.textBold}>Total amount: </Text>

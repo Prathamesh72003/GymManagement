@@ -5,7 +5,7 @@ import LottieView from "lottie-react-native";
 const SplashScreen = ({ navigation }) => {
   setTimeout(() => {
     navigation.replace("Login");
-  }, 2500);
+  }, 1500);
 
   return (
     <View style={styles.containerr}>

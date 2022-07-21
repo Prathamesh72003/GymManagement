@@ -7,17 +7,83 @@ import {
   Dimensions,
   ScrollView,
   TouchableOpacity,
-  Image
+  Image,
+  ToastAndroid
 } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {TextInput, Button} from 'react-native-paper';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const {width, height} = Dimensions.get('window');
 const SignupScreen = ({navigation}) => {
-  const [email, setEmail] = useState();
-  const [gymname, setGymname] = useState();
-  const [phone, setPhone] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState("");
+  const [gymname, setGymname] = useState("");
+  const [owner, setOwner] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+
+const RegisterGym = async () => {
+  if (email.length == 0 && gymname.length == 0 && phone.length == 0 && password.length == 0) {
+    ToastAndroid.show(
+      'Fill the required fields!',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER,
+    );
+  }else{
+    await auth()
+    .createUserWithEmailAndPassword(email, password)
+    .then(() => {
+      firestore().collection('GYM').doc(email).set({
+        id: email,
+        email: email,
+        gymname: gymname,
+        owner: owner,
+        phone: phone,
+        password: password,
+        date: new Date().toLocaleString()
+      }).then(()=>{
+        console.log("User added to firebase");
+      })
+      ToastAndroid.show(
+        'Account created successfully!',
+        ToastAndroid.LONG,
+        ToastAndroid.CENTER,
+      );
+      navigation.replace('Login');
+    }).catch(error => {
+      if (error.code === 'auth/email-already-in-use') {
+        // console.log('That email address is already in use!');
+        ToastAndroid.show(
+          'That email address is already in use!',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
+
+      if (error.code === 'auth/invalid-email') {
+        // console.log('That email address is invalid!');
+        ToastAndroid.show(
+          'The email address is invalid!',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
+      if (error.code === 'auth/weak-password') {
+        // console.log('Password should be more than 6 digits!');
+        ToastAndroid.show(
+          'Password should be more than 6 digits!',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
+
+      console.error(error);
+    });
+  }
+}
+
+
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -58,6 +124,15 @@ const SignupScreen = ({navigation}) => {
                 onChangeText={text => setGymname(text)}
                 mode="outlined"
               />
+              
+              <TextInput
+                style={styles.inputContainer}
+                label="Owner name"
+                activeOutlineColor='#2F50C9'
+                value={owner}
+                onChangeText={text => setOwner(text)}
+                mode="outlined"
+              />
              
               <TextInput
                 style={styles.inputContainer}
@@ -96,7 +171,7 @@ const SignupScreen = ({navigation}) => {
                     backgroundColor: '#2F50C9',
                   }}
                   mode="contained"
-                  onPress={() => navigation.navigate('Login')}>
+                  onPress={() => RegisterGym()}>
                   SignUp
                 </Button>
               </View>

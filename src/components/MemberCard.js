@@ -22,6 +22,7 @@ import {
     return (
       <View>
         {/* <Provider style={{padding: 0, margin: 0}}> */}
+          <TouchableOpacity onPress={()=>{console.log("presses")}}>
           <View style={styles.memberCard}>
             <View style={styles.memberCardLeft}>
               <View style={styles.memberAvatar}>
@@ -101,6 +102,7 @@ import {
               </Menu>
             </View>
           </View>
+          </TouchableOpacity>
         {/* </Provider> */}
       </View>
     );
@@ -116,6 +118,7 @@ import {
       marginVertical: 15,
       backgroundColor: '#fff',
       borderRadius: 15,
+      elevation: 5
     },
     memberCardLeft: {
       display: 'flex',

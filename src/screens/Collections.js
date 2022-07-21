@@ -200,6 +200,10 @@ const Collections = () => {
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         {/* date block */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Collection</Text>
+        </View>
+        <View style={styles.body}>
         <View style={styles.block}>
           <Text style={styles.blockTitle}>Overall collection</Text>
           <View style={styles.blockDivider} />
@@ -410,6 +414,7 @@ const Collections = () => {
           </View>
         </View>
         <View style={{ marginBottom: 80 }}></View>
+        </View>
       </View>
     </ScrollView>
   );
@@ -420,8 +425,28 @@ export default Collections;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#2f50c9",
+  },
+  header: {
+    backgroundColor: "#2f50c9",
+    // backgroundColor: '#04080F',
     padding: 20,
+    paddingTop: 30,
+    paddingBottom: 60,
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 25,
+    fontWeight: "600",
+  },
+  body: {
+    height: "100%",
+    marginTop: -30,
+    overflow: "hidden",
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
+    backgroundColor: "#fff",
+    padding: 20
   },
   block: {
     backgroundColor: "#fff",
@@ -432,10 +457,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
+    borderRadius: 5,
+    overflow: "hidden"
   },
   blockTitle: {
     fontSize: 20,
-    color: "#2f50c9",
+    color: "#000",
     fontWeight: "bold",
   },
   blockDivider: {

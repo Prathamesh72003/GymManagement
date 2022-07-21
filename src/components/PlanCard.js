@@ -9,11 +9,11 @@ const PlanCard = props => {
       <View>
         <Text style={styles.text} numberOfLines={1}>
           <Text style={styles.textBold}>Plan name: </Text>
-          {props.data.name}
+          {props.data.plan}
         </Text>
         <Text style={styles.text} numberOfLines={1}>
           <Text style={styles.textBold}>{props.data.durationType}: </Text>
-          {props.data.duration}
+          {props.data.months}
         </Text>
         <Text style={styles.text} numberOfLines={1}>
           <Text style={styles.textBold}>Total amount: </Text>
