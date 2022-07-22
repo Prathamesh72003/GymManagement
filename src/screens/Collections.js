@@ -24,11 +24,11 @@ const chartConfig = {
 const plansSelectedTable = [
   {
     id: 10,
-    memID: 1,
     durationType: "Month",
     duration: "30 days",
     amount: 400,
     amountPaid: 100,
+    discount: 200,
     date: "",
   },
   {
@@ -54,9 +54,9 @@ const plansSelectedTable = [
 const servicesSelectedTable = [
   {
     id: 10,
-    memID: 1,
-    name: "Cardio",
+    service: "Cardio",
     amount: 400,
+    discount: 100,
     amountPaid: 0,
     date: "",
   },
@@ -204,216 +204,222 @@ const Collections = () => {
           <Text style={styles.headerTitle}>Collection</Text>
         </View>
         <View style={styles.body}>
-        <View style={styles.block}>
-          <Text style={styles.blockTitle}>Overall collection</Text>
-          <View style={styles.blockDivider} />
-          {pie_chart_data.data != null ? (
-            <PieChart
-              data={pie_chart_data.data}
-              width={Dimensions.get("window").width - 40}
-              height={220}
-              chartConfig={chartConfig}
-              accessor={"amount"}
-              backgroundColor={"transparent"}
-              paddingLeft={"0"}
-              center={[0, 0]}
-              absolute
-            />
-          ) : null}
-        </View>
+          <View style={styles.block}>
+            <Text style={styles.blockTitle}>Overall collection</Text>
+            <View style={styles.blockDivider} />
+            {pie_chart_data.data != null ? (
+              <PieChart
+                data={pie_chart_data.data}
+                width={Dimensions.get("window").width - 40}
+                height={220}
+                chartConfig={chartConfig}
+                accessor={"amount"}
+                backgroundColor={"transparent"}
+                paddingLeft={"0"}
+                center={[0, 0]}
+                absolute
+              />
+            ) : null}
+          </View>
 
-        {/* member plan collection block */}
-        <View style={styles.block}>
-          <Text style={styles.blockTitle}>Members's plan collection</Text>
-          <View style={styles.blockDivider} />
-          <View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Total members: {members.length}
-              </Text>
+          {/* member plan collection block */}
+          <View style={styles.block}>
+            <Text style={styles.blockTitle}>Members's plan collection</Text>
+            <View style={styles.blockDivider} />
+            <View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Total members: {members.length}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Total amount:{" "}
+                  {planCollection != null ? planCollection.total : null}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Received:{" "}
+                  {planCollection != null ? planCollection.received : null}
+                </Text>
+                <Text style={styles.boldText}>
+                  Remaining:{" "}
+                  {planCollection != null ? planCollection.remaining : null}
+                </Text>
+              </View>
             </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Total amount:{" "}
-                {planCollection != null ? planCollection.total : null}
-              </Text>
+            <View style={styles.blockDivider} />
+            <View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Full paid:{" "}
+                  {planCollection != null ? planCollection.plan_full : null}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Total amount:{" "}
+                  {planCollection != null
+                    ? planCollection.plan_full_total
+                    : null}
+                </Text>
+              </View>
             </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Received:{" "}
-                {planCollection != null ? planCollection.received : null}
-              </Text>
-              <Text style={styles.boldText}>
-                Remaining:{" "}
-                {planCollection != null ? planCollection.remaining : null}
-              </Text>
+            <View style={styles.blockDivider} />
+            <View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Remainder balance:{" "}
+                  {planCollection != null ? planCollection.plan_reminder : null}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Total amount:{" "}
+                  {planCollection != null
+                    ? planCollection.plan_reminder_total
+                    : null}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Received:{" "}
+                  {planCollection != null
+                    ? planCollection.plan_reminder_received
+                    : null}
+                </Text>
+                <Text style={styles.boldText}>
+                  Remaining:{" "}
+                  {planCollection != null
+                    ? planCollection.plan_reminder_remaining
+                    : null}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.blockDivider} />
+            <View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Unpaid payment:{" "}
+                  {planCollection != null ? planCollection.plan_unpaid : null}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Total amount:{" "}
+                  {planCollection != null
+                    ? planCollection.plan_unpaid_total
+                    : null}
+                </Text>
+              </View>
             </View>
           </View>
-          <View style={styles.blockDivider} />
-          <View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Full paid:{" "}
-                {planCollection != null ? planCollection.plan_full : null}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Total amount:{" "}
-                {planCollection != null ? planCollection.plan_full_total : null}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.blockDivider} />
-          <View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Remainder balance:{" "}
-                {planCollection != null ? planCollection.plan_reminder : null}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Total amount:{" "}
-                {planCollection != null
-                  ? planCollection.plan_reminder_total
-                  : null}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Received:{" "}
-                {planCollection != null
-                  ? planCollection.plan_reminder_received
-                  : null}
-              </Text>
-              <Text style={styles.boldText}>
-                Remaining:{" "}
-                {planCollection != null
-                  ? planCollection.plan_reminder_remaining
-                  : null}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.blockDivider} />
-          <View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Unpaid payment:{" "}
-                {planCollection != null ? planCollection.plan_unpaid : null}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Total amount:{" "}
-                {planCollection != null
-                  ? planCollection.plan_unpaid_total
-                  : null}
-              </Text>
-            </View>
-          </View>
-        </View>
 
-        {/* member service collection */}
-        <View style={styles.block}>
-          <Text style={styles.blockTitle}>Members's service collection</Text>
-          <View style={styles.blockDivider} />
-          <View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Total members: {members.length}
-              </Text>
+          {/* member service collection */}
+          <View style={styles.block}>
+            <Text style={styles.blockTitle}>Members's service collection</Text>
+            <View style={styles.blockDivider} />
+            <View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Total members: {members.length}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Total amount:{" "}
+                  {serviceCollection != null ? serviceCollection.total : null}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Received:{" "}
+                  {serviceCollection != null
+                    ? serviceCollection.received
+                    : null}
+                </Text>
+                <Text style={styles.boldText}>
+                  Remaining:{" "}
+                  {serviceCollection != null
+                    ? serviceCollection.remaining
+                    : null}
+                </Text>
+              </View>
             </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Total amount:{" "}
-                {serviceCollection != null ? serviceCollection.total : null}
-              </Text>
+            <View style={styles.blockDivider} />
+            <View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Full paid:{" "}
+                  {serviceCollection != null
+                    ? serviceCollection.service_full
+                    : null}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Total amount:{" "}
+                  {serviceCollection != null
+                    ? serviceCollection.service_full_total
+                    : null}
+                </Text>
+              </View>
             </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Received:{" "}
-                {serviceCollection != null ? serviceCollection.received : null}
-              </Text>
-              <Text style={styles.boldText}>
-                Remaining:{" "}
-                {serviceCollection != null ? serviceCollection.remaining : null}
-              </Text>
+            <View style={styles.blockDivider} />
+            <View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Remainder balance:{" "}
+                  {serviceCollection != null
+                    ? serviceCollection.service_reminder
+                    : null}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Total amount:{" "}
+                  {serviceCollection != null
+                    ? serviceCollection.service_reminder_total
+                    : null}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Received:{" "}
+                  {serviceCollection != null
+                    ? serviceCollection.service_reminder_received
+                    : null}
+                </Text>
+                <Text style={styles.boldText}>
+                  Remaining:{" "}
+                  {serviceCollection != null
+                    ? serviceCollection.service_reminder_remaining
+                    : null}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.blockDivider} />
+            <View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Unpaid payment:{" "}
+                  {serviceCollection != null
+                    ? serviceCollection.service_unpaid
+                    : null}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.boldText}>
+                  Total amount:{" "}
+                  {serviceCollection != null
+                    ? serviceCollection.service_unpaid_total
+                    : null}
+                </Text>
+              </View>
             </View>
           </View>
-          <View style={styles.blockDivider} />
-          <View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Full paid:{" "}
-                {serviceCollection != null
-                  ? serviceCollection.service_full
-                  : null}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Total amount:{" "}
-                {serviceCollection != null
-                  ? serviceCollection.service_full_total
-                  : null}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.blockDivider} />
-          <View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Remainder balance:{" "}
-                {serviceCollection != null
-                  ? serviceCollection.service_reminder
-                  : null}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Total amount:{" "}
-                {serviceCollection != null
-                  ? serviceCollection.service_reminder_total
-                  : null}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Received:{" "}
-                {serviceCollection != null
-                  ? serviceCollection.service_reminder_received
-                  : null}
-              </Text>
-              <Text style={styles.boldText}>
-                Remaining:{" "}
-                {serviceCollection != null
-                  ? serviceCollection.service_reminder_remaining
-                  : null}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.blockDivider} />
-          <View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Unpaid payment:{" "}
-                {serviceCollection != null
-                  ? serviceCollection.service_unpaid
-                  : null}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.boldText}>
-                Total amount:{" "}
-                {serviceCollection != null
-                  ? serviceCollection.service_unpaid_total
-                  : null}
-              </Text>
-            </View>
-          </View>
-        </View>
-        <View style={{ marginBottom: 80 }}></View>
+          <View style={{ marginBottom: 80 }}></View>
         </View>
       </View>
     </ScrollView>
@@ -446,7 +452,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
     backgroundColor: "#fff",
-    padding: 20
+    padding: 20,
   },
   block: {
     backgroundColor: "#fff",
@@ -458,7 +464,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 5,
     borderRadius: 5,
-    overflow: "hidden"
+    overflow: "hidden",
   },
   blockTitle: {
     fontSize: 20,

@@ -3,11 +3,15 @@ import {
   StyleSheet,
   Text,
   View,
+  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import { FAB, Provider } from "react-native-paper";
 import MemberCard from "./../components/MemberCard";
+import firestore from "@react-native-firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const data = [
   {
@@ -31,6 +35,68 @@ const data = [
 ];
 
 const Members = ({ navigation }) => {
+  const [membersData, setMembersData] = useState([]);
+  const [initializing, setInitializing] = useState(true);
+
+  useEffect(() => {
+    getMembers();
+  }, []);
+
+  const getMembers = async () => {
+    try {
+      const value = await AsyncStorage.getItem("GYM");
+
+      const membersList = [];
+      await firestore()
+        .collection("GYM")
+        .doc(value)
+        .collection("MEMBERS")
+        .get()
+        .then((result) => {
+          result.forEach((doc) => {
+            const {
+              id,
+              email_id,
+              gender,
+              phone_no,
+              joining_date,
+              plans,
+              service,
+              name,
+            } = doc.data();
+            membersList.push({
+              id,
+              email_id,
+              gender,
+              phone_no,
+              joining_date,
+              plans,
+              service,
+              name,
+            });
+          });
+        });
+      setMembersData(membersList);
+      setInitializing(false);
+    } catch (error) {
+      console.log("eee" + error);
+    }
+  };
+
+  if (initializing) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -38,7 +104,7 @@ const Members = ({ navigation }) => {
     >
       <Provider>
         <View style={styles.body}>
-          {data.map((item) => {
+          {membersData.map((item) => {
             console.log(item.name);
             return <MemberCard key={item.id} data={item} />;
           })}

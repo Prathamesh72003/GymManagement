@@ -1,9 +1,9 @@
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
-import React from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import React from "react";
 
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import AntDesign from "react-native-vector-icons/AntDesign";
 
-const PlanCard = props => {
+const PlanCard = (props) => {
   return (
     <View style={styles.container}>
       <View>
@@ -13,7 +13,7 @@ const PlanCard = props => {
         </Text>
         <Text style={styles.text} numberOfLines={1}>
           <Text style={styles.textBold}>{props.data.durationType}: </Text>
-          {props.data.months}
+          {props.data.duration}
         </Text>
         <Text style={styles.text} numberOfLines={1}>
           <Text style={styles.textBold}>Total amount: </Text>
@@ -33,18 +33,18 @@ export default PlanCard;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
     marginVertical: 10,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   text: {
     fontSize: 17,
@@ -52,6 +52,6 @@ const styles = StyleSheet.create({
   },
   textBold: {
     marginRight: 10,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

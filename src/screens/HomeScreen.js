@@ -5,6 +5,7 @@ import {
   Dimensions,
   View,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import Card from "../components/Card";
@@ -12,6 +13,7 @@ import Card from "../components/Card";
 import { LineChart } from "react-native-chart-kit";
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const data = {
   labels: ["January", "February", "March", "April", "May", "June"],
@@ -44,86 +46,102 @@ const chartConfig = {
 
 const HomeScreen = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState("");
-  const [totalServices, setTotalServices] = useState("");
-  const [totalPlans, setTotalPlans] = useState("");
-
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
+  const [user, setUser] = useState({ email: "official.sasp@gmail.com" });
+  const [totalServices, setTotalServices] = useState();
+  const [totalPlans, setTotalPlans] = useState();
 
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
+    fetchData();
   }, []);
 
-  if (initializing) return null;
-
-  if (!user) {
-    return navigation.replace("Login");
+  async function fetchData() {
+    const value = await AsyncStorage.getItem("GYM");
+    console.log("function called");
+    const services = await firestore()
+      .collection("GYM")
+      .doc(value)
+      .collection("SERVICES")
+      .get();
+    setTotalServices(services.size);
+    const plans = await firestore()
+      .collection("GYM")
+      .doc(value)
+      .collection("PLANS")
+      .get();
+    setTotalPlans(plans.size);
+    setInitializing(false);
   }
 
-  firestore()
-    .collection("GYM")
-    .doc(user.email)
-    .collection("SERVICES")
-    .get()
-    .then((querySnapshot) => {
-      setTotalServices(querySnapshot.size);
-    });
-  firestore()
-    .collection("GYM")
-    .doc(user.email)
-    .collection("PLANS")
-    .get()
-    .then((querySnapshot) => {
-      setTotalPlans(querySnapshot.size);
-    });
-  return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View styles={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Universal GYM</Text>
-        </View>
-        <View style={styles.body}>
-          <View style={styles.row}>
-            <Card
-              width={"100%"}
-              count={78}
-              title={"Members"}
-              intent={"Members"}
-            />
-          </View>
-          <View style={styles.row}>
-            <Card width={"45%"} count={totalPlans} title={"Plans"} intent={"Plans"} />
-            <Card
-              width={"45%"}
-              count={totalServices}
-              title={"Services"}
-              intent={"Services"}
-            />
-          </View>
-          <View style={styles.chart}>
-            <LineChart
-              data={data}
-              withInnerLines={false}
-              withDot={false}
-              style={{
-                // marginVertical: 8,
-                borderRadius: 20,
-              }}
-              width={Dimensions.get("window").width - 40}
-              height={256}
-              verticalLabelRotation={30}
-              chartConfig={chartConfig}
-              bezier
-            />
-          </View>
-        </View>
+  // if (initializing) return null;
+
+  // if (!user) {
+  //   return navigation.replace("Login");
+  // }
+
+  if (initializing) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <ActivityIndicator size="large" color="#0000ff" />
       </View>
-    </ScrollView>
-  );
+    );
+  } else {
+    return (
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View styles={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Universal GYM</Text>
+          </View>
+          <View style={styles.body}>
+            <View style={styles.row}>
+              <Card
+                width={"100%"}
+                count={78}
+                title={"Members"}
+                intent={"Members"}
+              />
+            </View>
+            <View style={styles.row}>
+              <Card
+                width={"45%"}
+                count={totalPlans}
+                title={"Plans"}
+                intent={"Plans"}
+              />
+              <Card
+                width={"45%"}
+                count={totalServices}
+                title={"Services"}
+                intent={"Services"}
+              />
+            </View>
+            <View style={styles.chart}>
+              <LineChart
+                data={data}
+                withInnerLines={false}
+                withDot={false}
+                style={{
+                  // marginVertical: 8,
+                  borderRadius: 20,
+                }}
+                width={Dimensions.get("window").width - 40}
+                height={256}
+                verticalLabelRotation={30}
+                chartConfig={chartConfig}
+                bezier
+              />
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    );
+  }
 };
 
 export default HomeScreen;

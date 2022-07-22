@@ -1,11 +1,26 @@
 import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
+
 import LottieView from "lottie-react-native";
+import auth from "@react-native-firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SplashScreen = ({ navigation }) => {
-  setTimeout(() => {
-    navigation.replace("Login");
-  }, 1500);
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
+
+  useEffect(async () => {
+    const value = await AsyncStorage.getItem("GYM");
+    if (value != null) {
+      setTimeout(() => {
+        navigation.replace("Home");
+      }, 2500);
+    } else {
+      setTimeout(() => {
+        navigation.replace("Login");
+      }, 2500);
+    }
+  }, []);
 
   return (
     <View style={styles.containerr}>

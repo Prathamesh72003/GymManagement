@@ -3,6 +3,7 @@ import {
   StyleSheet,
   Text,
   View,
+  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect } from "react";
@@ -11,6 +12,7 @@ import { FAB } from "react-native-paper";
 import PlanCard from "../components/PlanCard";
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const data = [
   {
@@ -34,47 +36,50 @@ const Plans = ({ navigation }) => {
   const [user, setUser] = useState("");
   const [plans, setPlans] = useState([]);
 
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
+    const getPlans = async () => {
+      const value = await AsyncStorage.getItem("GYM");
 
-  const getPlans = async () => {
-    try {
-      const planList = [];
-      await firestore()
-        .collection("GYM")
-        .doc(user.email)
-        .collection("PLANS")
-        .get()
-        .then((result) => {
-          result.forEach((doc) => {
-            const { plan, durationType, months, amount } = doc.data();
-            planList.push({
-              plan,
-              durationType,
-              months,
-              amount,
+      try {
+        const planList = [];
+        await firestore()
+          .collection("GYM")
+          .doc(value)
+          .collection("PLANS")
+          .get()
+          .then((result) => {
+            result.forEach((doc) => {
+              const { plan, durationType, duration, amount } = doc.data();
+              planList.push({
+                plan,
+                durationType,
+                duration,
+                amount,
+              });
             });
           });
-        });
-      setPlans(planList);
-    } catch (error) {
-      console.log("eee" + error);
-    }
-  };
+        setPlans(planList);
+        setInitializing(false);
+      } catch (error) {
+        console.log("eee" + error);
+      }
+    };
+    getPlans();
+  }, []);
 
-  getPlans();
-
-  if (initializing) return null;
-
-  if (!user) {
-    return navigation.replace("Login");
+  if (initializing) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
 
   return (
@@ -83,9 +88,10 @@ const Plans = ({ navigation }) => {
       styles={styles.container}
     >
       <View style={styles.body}>
-        {plans.map((item, index) => {
-          return <PlanCard key={index} data={item} />;
-        })}
+        {plans != null &&
+          plans.map((item, index) => {
+            return <PlanCard key={index} data={item} />;
+          })}
         <FAB
           color={"#fff"}
           icon="plus"

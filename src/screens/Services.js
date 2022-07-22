@@ -4,13 +4,17 @@ import {
   Text,
   View,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
+
 import React, { useState, useEffect } from "react";
+
 import { FAB } from "react-native-paper";
 import MemberCard from "../components/MemberCard";
 import ServiceCard from "../components/ServiceCard";
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const data = [
   {
@@ -26,55 +30,54 @@ const data = [
 ];
 
 const Services = ({ navigation }) => {
-
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState("");
   const [services, setServices] = useState([]);
 
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);  
+    getServices();
+  }, []);
 
-    const getServices = async () => {
-      try {
-        const serviceList = [];
-        await firestore()
-          .collection("GYM")
-          .doc(user.email)
-          .collection("SERVICES")
-          .get()
-          .then((result) => {
-            result.forEach((doc) => {
-              const { service, amount } = doc.data();
-              serviceList.push({
-                service,
-                amount,
-              });
+  const getServices = async () => {
+    try {
+      const value = await AsyncStorage.getItem("GYM");
+
+      const serviceList = [];
+      await firestore()
+        .collection("GYM")
+        .doc(value)
+        .collection("SERVICES")
+        .get()
+        .then((result) => {
+          result.forEach((doc) => {
+            const { service, amount } = doc.data();
+            serviceList.push({
+              service,
+              amount,
             });
           });
-        setServices(serviceList);
-      } catch (error) {
-        console.log("eee" + error);
-      }
-    };
+        });
+      setServices(serviceList);
+      setInitializing(false);
+    } catch (error) {
+      console.log("eee" + error);
+    }
+  };
 
-    getServices();
-
-   
-
-
-  if (initializing) return null;
-
-  if (!user) {
-    return navigation.replace("Login");
+  if (initializing) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
-
 
   return (
     <ScrollView
@@ -82,7 +85,7 @@ const Services = ({ navigation }) => {
       styles={styles.container}
     >
       <View style={styles.body}>
-        {services.map((item,index) => {
+        {services.map((item, index) => {
           return <ServiceCard key={index} data={item} />;
         })}
         <FAB

@@ -8,11 +8,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  ToastAndroid
+  ToastAndroid,
 } from "react-native";
 import FontAwsome5 from "react-native-vector-icons/FontAwesome5";
 import { TextInput, Button } from "react-native-paper";
-import auth from '@react-native-firebase/auth';
+import auth from "@react-native-firebase/auth";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 const LoginScreen = ({ navigation }) => {
@@ -22,36 +24,37 @@ const LoginScreen = ({ navigation }) => {
   const loginFun = async () => {
     if (email.length == 0 && password.length == 0) {
       ToastAndroid.show(
-        'Fill the required fields!',
+        "Fill the required fields!",
         ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
+        ToastAndroid.CENTER
       );
     } else {
       await auth()
         .signInWithEmailAndPassword(email, password)
-        .then(() => {
+        .then(async () => {
           ToastAndroid.show(
-            'Logged in successfully!',
+            "Logged in successfully!",
             ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
+            ToastAndroid.CENTER
           );
-          navigation.replace('Home', {email: email});
+          await AsyncStorage.setItem("GYM", email);
+          navigation.replace("Home", { email: email });
         })
-        .catch(error => {
-          if (error.code === 'auth/invalid-email') {
+        .catch((error) => {
+          if (error.code === "auth/invalid-email") {
             // console.log('The email address is invalid!');
             ToastAndroid.show(
-              'Invalid email address!',
+              "Invalid email address!",
               ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
+              ToastAndroid.CENTER
             );
           }
-          if (error.code === 'auth/wrong-password') {
+          if (error.code === "auth/wrong-password") {
             // console.log('The password does not matches the email id!');
             ToastAndroid.show(
-              'Invalid password!',
+              "Invalid password!",
               ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
+              ToastAndroid.CENTER
             );
           }
 
@@ -61,7 +64,7 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={{backgroundColor: '#fff'}}>
+    <ScrollView style={{ backgroundColor: "#fff" }}>
       <View style={styles.container}>
         <ImageBackground
           source={require("../assets/background.png")}
