@@ -15,18 +15,6 @@ import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const data = {
-  labels: ["January", "February", "March", "April", "May", "June"],
-  datasets: [
-    {
-      data: [20, 45, 28, 80, 99, 43],
-      color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
-      strokeWidth: 2, // optional
-    },
-  ],
-  legend: ["Members count"], // optional
-};
-
 const chartConfig = {
   backgroundColor: "#fff",
   backgroundGradientFrom: "#fff",
@@ -49,6 +37,8 @@ const HomeScreen = ({ navigation }) => {
   const [user, setUser] = useState({ email: "official.sasp@gmail.com" });
   const [totalServices, setTotalServices] = useState();
   const [totalPlans, setTotalPlans] = useState();
+  const [chartLoading, setChartLoading] = useState(true);
+  const [chartData, setChartData] = useState();
 
   useEffect(() => {
     fetchData();
@@ -69,14 +59,89 @@ const HomeScreen = ({ navigation }) => {
       .collection("PLANS")
       .get();
     setTotalPlans(plans.size);
+
+    // creating line chart to display
     setInitializing(false);
+    fetchChartData(value);
   }
 
-  // if (initializing) return null;
+  async function fetchChartData(email_id) {
+    var months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
 
-  // if (!user) {
-  //   return navigation.replace("Login");
-  // }
+    var labels = [];
+    var d = new Date();
+    d.setMonth(d.getMonth() - 4);
+    labels.push(d.getMonth());
+
+    var d = new Date();
+    d.setMonth(d.getMonth() - 3);
+    labels.push(d.getMonth());
+
+    var d = new Date();
+    d.setMonth(d.getMonth());
+    labels.push(d.getMonth() - 2);
+
+    var d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    labels.push(d.getMonth());
+
+    var d = new Date();
+    d.setMonth(d.getMonth());
+    labels.push(d.getMonth());
+
+    d.setMonth(d.getMonth() + 1);
+    labels.push(d.getMonth());
+
+    var month_labels = [];
+    labels.forEach((index) => {
+      month_labels.push(months[index]);
+    });
+
+    // var d = new Date();
+    var start_date = new Date("1/" + (labels[0] + 1) + "/" + d.getFullYear());
+
+    const members = await firestore()
+      .collection("GYM")
+      .doc(email_id)
+      .collection("MEMBERS")
+      .where("joining_date", ">", start_date)
+      .get();
+
+    var memberCount = [0, 0, 0, 0, 0, 0];
+    members.docs.map((item) => {
+      var data = item._data;
+      var date = new Date(1970, 0, 1);
+      date.setSeconds(data.joining_date.seconds);
+      memberCount[date.getMonth() - labels[0]]++;
+      // console.log(date);
+    });
+
+    setChartData({
+      labels: month_labels,
+      datasets: [
+        {
+          data: memberCount,
+          color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
+          strokeWidth: 2, // optional
+        },
+      ],
+      legend: ["Members count"], // optional
+    });
+    setChartLoading(false);
+  }
 
   if (initializing) {
     return (
@@ -122,20 +187,33 @@ const HomeScreen = ({ navigation }) => {
               />
             </View>
             <View style={styles.chart}>
-              <LineChart
-                data={data}
-                withInnerLines={false}
-                withDot={false}
-                style={{
-                  // marginVertical: 8,
-                  borderRadius: 20,
-                }}
-                width={Dimensions.get("window").width - 40}
-                height={256}
-                verticalLabelRotation={30}
-                chartConfig={chartConfig}
-                bezier
-              />
+              {chartLoading == true ? (
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flex: 1,
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+              ) : (
+                <LineChart
+                  data={chartData}
+                  withInnerLines={false}
+                  withDot={false}
+                  style={{
+                    // marginVertical: 8,
+                    borderRadius: 20,
+                  }}
+                  width={Dimensions.get("window").width - 40}
+                  height={256}
+                  verticalLabelRotation={30}
+                  chartConfig={chartConfig}
+                  bezier
+                />
+              )}
             </View>
           </View>
         </View>
@@ -171,7 +249,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
     backgroundColor: "#fff",
-    marginBottom: 80,
+    marginBottom: 100,
   },
   row: {
     flexDirection: "row",
@@ -186,5 +264,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
+    // height: 256,
   },
 });

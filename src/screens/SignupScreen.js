@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,110 +8,123 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  ToastAndroid
-} from 'react-native';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import {TextInput, Button} from 'react-native-paper';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+  ToastAndroid,
+} from "react-native";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { TextInput, Button } from "react-native-paper";
+import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
 
-const {width, height} = Dimensions.get('window');
-const SignupScreen = ({navigation}) => {
+const { width, height } = Dimensions.get("window");
+const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [gymname, setGymname] = useState("");
   const [owner, setOwner] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
 
-const RegisterGym = async () => {
-  if (email.length == 0 && gymname.length == 0 && phone.length == 0 && password.length == 0) {
-    ToastAndroid.show(
-      'Fill the required fields!',
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER,
-    );
-  }else{
-    await auth()
-    .createUserWithEmailAndPassword(email, password)
-    .then(() => {
-      firestore().collection('GYM').doc(email).set({
-        id: email,
-        email: email,
-        gymname: gymname,
-        owner: owner,
-        phone: phone,
-        password: password,
-        date: new Date().toLocaleString()
-      }).then(()=>{
-        console.log("User added to firebase");
-      })
+  const RegisterGym = async () => {
+    if (
+      email.length == 0 &&
+      gymname.length == 0 &&
+      phone.length == 0 &&
+      password.length == 0
+    ) {
       ToastAndroid.show(
-        'Account created successfully!',
-        ToastAndroid.LONG,
-        ToastAndroid.CENTER,
+        "Fill the required fields!",
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
       );
-      navigation.replace('Login');
-    }).catch(error => {
-      if (error.code === 'auth/email-already-in-use') {
-        // console.log('That email address is already in use!');
-        ToastAndroid.show(
-          'That email address is already in use!',
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
-      }
+    } else {
+      await auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          firestore()
+            .collection("GYM")
+            .doc(email)
+            .set({
+              id: email,
+              email: email,
+              gymname: gymname,
+              owner: owner,
+              phone: phone,
+              password: password,
+              date: new Date(),
+            })
+            .then(() => {
+              console.log("User added to firebase");
+            });
+          ToastAndroid.show(
+            "Account created successfully!",
+            ToastAndroid.LONG,
+            ToastAndroid.CENTER
+          );
+          navigation.replace("Login");
+        })
+        .catch((error) => {
+          if (error.code === "auth/email-already-in-use") {
+            // console.log('That email address is already in use!');
+            ToastAndroid.show(
+              "That email address is already in use!",
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER
+            );
+          }
 
-      if (error.code === 'auth/invalid-email') {
-        // console.log('That email address is invalid!');
-        ToastAndroid.show(
-          'The email address is invalid!',
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
-      }
-      if (error.code === 'auth/weak-password') {
-        // console.log('Password should be more than 6 digits!');
-        ToastAndroid.show(
-          'Password should be more than 6 digits!',
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
-      }
+          if (error.code === "auth/invalid-email") {
+            // console.log('That email address is invalid!');
+            ToastAndroid.show(
+              "The email address is invalid!",
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER
+            );
+          }
+          if (error.code === "auth/weak-password") {
+            // console.log('Password should be more than 6 digits!');
+            ToastAndroid.show(
+              "Password should be more than 6 digits!",
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER
+            );
+          }
 
-      console.error(error);
-    });
-  }
-}
-
+          console.error(error);
+        });
+    }
+  };
 
   return (
     <ScrollView>
       <View style={styles.container}>
         <ImageBackground
-          source={require('../assets/background.png')}
-          style={{height: height / 2.5}}>
+          source={require("../assets/background.png")}
+          style={{ height: height / 2.5 }}
+        >
           <View style={styles.UpperContainer}>
             {/* <FontAwsome5
                 name="motorcycle"
                 size={60}
                 style={{color: '#fff'}}
               /> */}
-            
+
             <Text style={styles.BrandText}> GYM BOOK</Text>
           </View>
         </ImageBackground>
         <View style={styles.bottomContainer}>
-          <View style={{padding: 30}}>
+          <View style={{ padding: 30 }}>
             <Text style={styles.WelcomeText}>Create an account</Text>
-            <View style={{display: 'flex', flexDirection: 'row', marginTop: 5}}>
+            <View
+              style={{ display: "flex", flexDirection: "row", marginTop: 5 }}
+            >
               <Text style={styles.RegisterText}>Already an user? </Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate('Login')}
+                onPress={() => navigation.navigate("Login")}
                 style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <Text style={styles.RegisterSub}>Login Now</Text>
               </TouchableOpacity>
             </View>
@@ -119,59 +132,60 @@ const RegisterGym = async () => {
               <TextInput
                 style={styles.inputContainer}
                 label="Gym Name"
-                activeOutlineColor='#2F50C9'
+                activeOutlineColor="#2F50C9"
                 value={gymname}
-                onChangeText={text => setGymname(text)}
+                onChangeText={(text) => setGymname(text)}
                 mode="outlined"
               />
-              
+
               <TextInput
                 style={styles.inputContainer}
                 label="Owner name"
-                activeOutlineColor='#2F50C9'
+                activeOutlineColor="#2F50C9"
                 value={owner}
-                onChangeText={text => setOwner(text)}
+                onChangeText={(text) => setOwner(text)}
                 mode="outlined"
               />
-             
+
               <TextInput
                 style={styles.inputContainer}
                 label="Email"
-                activeOutlineColor='#2F50C9'
+                activeOutlineColor="#2F50C9"
                 value={email}
-                onChangeText={text => setEmail(text)}
+                onChangeText={(text) => setEmail(text)}
                 mode="outlined"
               />
               <TextInput
                 style={styles.inputContainer}
                 label="Phone"
-                activeOutlineColor='#2F50C9'
+                activeOutlineColor="#2F50C9"
                 keyboardType="numeric"
                 value={phone}
-                onChangeText={text => setPhone(text)}
+                onChangeText={(text) => setPhone(text)}
                 mode="outlined"
               />
 
               <TextInput
                 style={styles.inputContainer}
                 label="Password"
-                activeOutlineColor='#2F50C9'
+                activeOutlineColor="#2F50C9"
                 secureTextEntry={true}
                 value={password}
-                onChangeText={text => setPassword(text)}
+                onChangeText={(text) => setPassword(text)}
                 mode="outlined"
               />
 
               <View style={styles.loginBtnContainer}>
                 <Button
                   style={{
-                    width: '60%',
+                    width: "60%",
                     borderRadius: 30,
                     elevation: 5,
-                    backgroundColor: '#2F50C9',
+                    backgroundColor: "#2F50C9",
                   }}
                   mode="contained"
-                  onPress={() => RegisterGym()}>
+                  onPress={() => RegisterGym()}
+                >
                   SignUp
                 </Button>
               </View>
@@ -187,42 +201,42 @@ export default SignupScreen;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    display: 'flex',
+    backgroundColor: "#fff",
+    display: "flex",
     // justifyContent: 'center',
     // alignItems: "center",
     flex: 1,
   },
   UpperContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     flex: 1,
   },
   BrandText: {
     fontSize: 30,
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   bottomContainer: {
     flex: 1.5,
     bottom: 60,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderTopStartRadius: 60,
     borderTopEndRadius: 60,
   },
   WelcomeText: {
     fontSize: 30,
-    color: '#2F50C9',
-    fontWeight: 'bold',
+    color: "#2F50C9",
+    fontWeight: "bold",
   },
   RegisterText: {
     fontSize: 15,
-    color: '#000',
+    color: "#000",
   },
   RegisterSub: {
     fontSize: 15,
-    color: '#2F50C9',
+    color: "#2F50C9",
   },
   formContainer: {
     marginTop: 20,
@@ -231,41 +245,41 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   forgotPassword: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   loginBtnContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 30,
   },
   otherLoginConatiner: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   genderContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     flex: 1,
   },
   boxContainer: {
     width: 100,
     height: 30,
     borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     elevation: 2,
-    marginTop: 5
+    marginTop: 5,
   },
   box: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
     width: 80,
-    justifyContent: 'space-around',
+    justifyContent: "space-around",
     // justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: "center",
   },
 });

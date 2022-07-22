@@ -24,14 +24,12 @@ const MemberCard = (props) => {
     props.data;
 
   // const plans_data = JSON.parse(plans);
-  console.log(plans);
 
   var plan_expiry = "";
   if (plans.length != 0) {
     var latest_plan = JSON.parse(plans[plans.length - 1]);
     var plan_start = latest_plan.date;
     var duration = parseInt(latest_plan.duration);
-    console.log(duration);
     plan_start = new Date(plan_start);
 
     if (latest_plan.durationType == "Month") {
@@ -52,12 +50,27 @@ const MemberCard = (props) => {
       plan_expiry.getFullYear();
   }
 
-  // var dueAmount =
+  var dueAmount = 0;
+  if (plans.length != 0) {
+    plans.map((item) => {
+      var plan = JSON.parse(item);
+      dueAmount += plan.amount - plan.discount - plan.amountPaid;
+    });
+  }
+
+  if (service.length != 0) {
+    service.map((item) => {
+      var ser = JSON.parse(item);
+      console.log(ser);
+      dueAmount += ser.amount - ser.discount - ser.amountPaid;
+    });
+  }
 
   return (
     <View>
       {/* <Provider style={{padding: 0, margin: 0}}> */}
       <TouchableOpacity
+        activeOpacity={0.9}
         onPress={() => {
           console.log("presses");
         }}
@@ -84,7 +97,7 @@ const MemberCard = (props) => {
             </Text>
             <Text style={styles.memberText} numberOfLines={1}>
               <Text style={styles.memberTextBold}>Due amount: </Text>
-              {500}
+              {dueAmount}
             </Text>
           </View>
           {/* <View style={{ flex: 1, zIndex: 200 }}>
