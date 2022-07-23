@@ -12,7 +12,7 @@ import { TextInput, RadioButton } from "react-native-paper";
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-const AddService = () => {
+const AddService = ({navigation}) => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState("");
   const [serviceName, setServiceName] = useState("");
@@ -47,8 +47,28 @@ const AddService = () => {
         amount: amount,
       }).then(()=>{
         console.log("Service added to firebase");
-        setServiceName("");
-        setAmount("");
+        firestore()
+          .collection("GYM")
+          .doc(user.email)
+            .update({
+              services: 31,
+            })
+            .then(() => {
+              console.log("Service count updated!");
+              firestore().collection("GYM").doc(user.email).collection("SERVICES").get().then(querySnapshot => {
+                firestore()
+                .collection("GYM")
+                .doc(user.email)
+                .update({
+                  services: querySnapshot.size.toString(),
+                })
+              }).then(() => {
+                  console.log("Plan count updated!");
+                  setServiceName("");
+                  setAmount("");
+                  navigation.navigate("Services");
+                });
+            });
       })
       ToastAndroid.show(
         'Service added successfully!',

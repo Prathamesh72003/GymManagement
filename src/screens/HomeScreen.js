@@ -37,6 +37,7 @@ const HomeScreen = ({ navigation }) => {
   const [user, setUser] = useState({ email: "official.sasp@gmail.com" });
   const [totalServices, setTotalServices] = useState();
   const [totalPlans, setTotalPlans] = useState();
+  const [totalMembers, setTotalMembers] = useState();
   const [chartLoading, setChartLoading] = useState(true);
   const [chartData, setChartData] = useState();
 
@@ -47,18 +48,18 @@ const HomeScreen = ({ navigation }) => {
   async function fetchData() {
     const value = await AsyncStorage.getItem("GYM");
     console.log("function called");
-    const services = await firestore()
-      .collection("GYM")
-      .doc(value)
-      .collection("SERVICES")
-      .get();
-    setTotalServices(services.size);
-    const plans = await firestore()
-      .collection("GYM")
-      .doc(value)
-      .collection("PLANS")
-      .get();
-    setTotalPlans(plans.size);
+
+    firestore()
+    .collection("GYM")
+    .doc(value)
+    .get()
+    .then((documentSnapshot) => {
+      if (documentSnapshot.exists) {
+        setTotalServices(documentSnapshot.data().services);
+        setTotalPlans(documentSnapshot.data().plans);
+        setTotalMembers(documentSnapshot.data().members);
+      }
+    });
 
     // creating line chart to display
     setInitializing(false);
@@ -167,7 +168,7 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.row}>
               <Card
                 width={"100%"}
-                count={78}
+                count={totalMembers}
                 title={"Members"}
                 intent={"Members"}
               />

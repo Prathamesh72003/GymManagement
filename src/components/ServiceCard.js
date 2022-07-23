@@ -1,9 +1,47 @@
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
-import React from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ToastAndroid,
+} from "react-native";
+import React from "react";
 
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import AntDesign from "react-native-vector-icons/AntDesign";
+import firestore from "@react-native-firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
-const ServiceCard = props => {
+const ServiceCard = (props) => {
+  const navigation = useNavigation();
+
+  const deleteService = async () => {
+    ToastAndroid.show("Processing request", ToastAndroid.SHORT);
+    var id = props.data.service;
+    const value = await AsyncStorage.getItem("GYM");
+
+    firestore()
+      .collection("GYM")
+      .doc(value)
+      .collection("SERVICES")
+      .doc(id)
+      .delete()
+      .then(() => {
+        ToastAndroid.show("Service successfully deleted !", ToastAndroid.SHORT);
+        firestore().collection("GYM").doc(value).collection("SERVICES").get().then(querySnapshot => {
+          firestore()
+          .collection("GYM")
+          .doc(value)
+          .update({
+            services: querySnapshot.size.toString(),
+          })
+        }).then(() => {
+            console.log("service count updated!");
+          });
+        navigation.replace("Services");
+      });
+  };
+
   return (
     <View style={styles.container}>
       <View>
@@ -17,7 +55,7 @@ const ServiceCard = props => {
         </Text>
       </View>
       <View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={deleteService}>
           <AntDesign name="delete" size={20} color="#ff0000" />
         </TouchableOpacity>
       </View>
@@ -29,18 +67,18 @@ export default ServiceCard;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
     marginVertical: 10,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   text: {
     fontSize: 17,
@@ -48,6 +86,6 @@ const styles = StyleSheet.create({
   },
   textBold: {
     marginRight: 10,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

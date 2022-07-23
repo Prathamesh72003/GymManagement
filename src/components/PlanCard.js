@@ -1,9 +1,49 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import React from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ToastAndroid,
+} from "react-native";
+import React,{ useState} from "react";
 
 import AntDesign from "react-native-vector-icons/AntDesign";
+import firestore from "@react-native-firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 const PlanCard = (props) => {
+  const navigation = useNavigation();
+
+  const [totalPlans, setTotalPlans] = useState();
+
+  const deletePlan = async () => {
+    ToastAndroid.show("Processing request", ToastAndroid.SHORT);
+    var id = props.data.plan;
+    const value = await AsyncStorage.getItem("GYM");
+
+    firestore()
+      .collection("GYM")
+      .doc(value)
+      .collection("PLANS")
+      .doc(id)
+      .delete()
+      .then(() => {
+        ToastAndroid.show("Plan successfully deleted !", ToastAndroid.SHORT);
+        firestore().collection("GYM").doc(value).collection("PLANS").get().then(querySnapshot => {
+          firestore()
+          .collection("GYM")
+          .doc(value)
+          .update({
+            plans: querySnapshot.size.toString(),
+          })
+        }).then(() => {
+            console.log("Plan count updated!");
+          });
+        navigation.replace("Plans");
+      });
+  };
+
   return (
     <View style={styles.container}>
       <View>
@@ -21,7 +61,7 @@ const PlanCard = (props) => {
         </Text>
       </View>
       <View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={deletePlan}>
           <AntDesign name="delete" size={20} color="#ff0000" />
         </TouchableOpacity>
       </View>

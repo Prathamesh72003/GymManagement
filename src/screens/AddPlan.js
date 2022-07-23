@@ -33,6 +33,7 @@ const AddPlan = ({ navigation }) => {
   const [days, setDays] = useState();
   const [months, setMonths] = useState();
   const [isFocus, setIsFocus] = useState(false);
+  const [plancount, setPlancount] = useState();
 
   function onAuthStateChanged(user) {
     setUser(user);
@@ -55,8 +56,8 @@ const AddPlan = ({ navigation }) => {
       (planName.length == 0 &&
         amount.length == 0 &&
         durationType.length == 0 &&
-        days.length == 0) ||
-      months.length == 0
+        days.length == 0 ||
+      months.length == 0)
     ) {
       ToastAndroid.show(
         "All fields required",
@@ -70,6 +71,7 @@ const AddPlan = ({ navigation }) => {
       } else {
         duration = days;
       }
+
       await firestore()
         .collection("GYM")
         .doc(user.email)
@@ -81,10 +83,25 @@ const AddPlan = ({ navigation }) => {
           durationType: durationType,
           duration: duration,
           // days: days,
-          months: months,
+          date: new Date(),
         })
         .then(() => {
-          console.log("Plan added to firebase");
+          console.log("Plan added to firebase");         
+          firestore().collection("GYM").doc(user.email).collection("PLANS").get().then(querySnapshot => {
+            firestore()
+            .collection("GYM")
+            .doc(user.email)
+            .update({
+              plans: querySnapshot.size.toString(),
+            })
+          }).then(() => {
+              console.log("Plan count updated!");
+            });
+            setPlanName("");
+            setAmount("");
+            setMonths();
+            setDays();
+            navigation.navigate("Plans")
         });
       ToastAndroid.show(
         "Plan added successfully!",

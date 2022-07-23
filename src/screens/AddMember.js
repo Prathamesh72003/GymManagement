@@ -4,46 +4,69 @@ import {
   Text,
   View,
   TouchableOpacity,
+  ActivityIndicator,
+  ToastAndroid,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { TextInput, RadioButton } from "react-native-paper";
 import { Dropdown } from "react-native-element-dropdown";
 import DatePicker from "react-native-datepicker";
+import firestore from "@react-native-firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const plans = [
-  {
-    id: 1,
-    name: "1 month",
-    value: "1 month",
-    label: "1 month",
-    amount: "200",
-    durationType: "Month",
-    duration: "1",
-  },
-  {
-    id: 2,
-    name: "Expiremental",
-    value: "Expiremental",
-    label: "Expiremental",
-    amount: "400",
-    durationType: "Days",
-    duration: "10",
-  },
-];
-
-const AddMember = () => {
-  const [name, setName] = useState();
-  const [phoneNO, setPhoneNO] = useState();
-  const [emailID, setEmailID] = useState();
+const AddMember = ({ navigation }) => {
+  const [initializing, setInitializing] = useState(true);
+  const [name, setName] = useState("");
+  const [phoneNO, setPhoneNO] = useState("");
+  const [emailID, setEmailID] = useState("");
   const [gender, setGender] = useState("male");
-  const [joiningDate, setJoiningDate] = useState("2022-07-20");
-  const [selectedPlan, setSelectedPlan] = useState(plans[0]);
+  const [joiningDate, setJoiningDate] = useState(new Date());
+
+  const [selectedPlan, setSelectedPlan] = useState();
+  const [plans, setPlans] = useState([]);
   const [isFocus, setIsFocus] = useState(false);
 
   const [amountPaid, setAmountPaid] = useState(0);
   const [discount, setDiscount] = useState(0);
-  const [dueAmount, setDueAmount] = useState(selectedPlan.amount);
+  const [dueAmount, setDueAmount] = useState();
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const fetchPlans = async () => {
+    if (plans.length == 0) {
+      const value = await AsyncStorage.getItem("GYM");
+
+      const plans_data = await firestore()
+        .collection("GYM")
+        .doc(value)
+        .collection("PLANS")
+        .get();
+      var i = 1;
+      var list = [];
+      plans_data._docs.map((plan) => {
+        var data = plan._data;
+        var obj = {
+          id: i,
+          name: data.plan,
+          value: data.plan,
+          label: data.plan,
+          amount: data.amount,
+          durationType: data.durationType,
+          duration: data.duration,
+        };
+        list.push(obj);
+        i++;
+      });
+      setPlans(list);
+      setSelectedPlan(list[0]);
+      setDueAmount(list[0].amount);
+      console.log(list);
+    }
+    setInitializing(false);
+  };
 
   const calculateDueAmountAfterAmount = (amountPaidNew) => {
     var amountPaidNewInt = parseInt(amountPaidNew);
@@ -66,6 +89,75 @@ const AddMember = () => {
     setDueAmount(amount + "");
     // console.log(dueAmountInt - (amountPaidNewInt + discountInt));
   };
+
+  const addMemberToDB = async () => {
+    const GYM_OWNER_EMAIL_ID = await AsyncStorage.getItem("GYM");
+
+    if (name.length != 0 && emailID.length != 0 && phoneNO.length != 0) {
+      var plans_array = [];
+      var plans_array_obj = {
+        durationType: selectedPlan.durationType,
+        duration: selectedPlan.duration,
+        plan: selectedPlan.name,
+        amount: selectedPlan.amount,
+        amountPaid: amountPaid,
+        discount: discount,
+        date: joiningDate,
+      };
+      plans_array.push(JSON.stringify(plans_array_obj));
+
+      var data = {
+        email_id: emailID,
+        gender: gender,
+        id: 1,
+        joining_date: joiningDate,
+        name: name,
+        phone_no: phoneNO,
+        plans: plans_array,
+        service: [],
+      };
+
+      firestore()
+        .collection("GYM")
+        .doc(GYM_OWNER_EMAIL_ID)
+        .collection("MEMBERS")
+        .add(data)
+        .then(() => {
+          ToastAndroid.show("Member added successfully !", ToastAndroid.SHORT);
+          firestore().collection("GYM").doc(GYM_OWNER_EMAIL_ID).collection("MEMBERS").get().then(querySnapshot => {
+            firestore()
+            .collection("GYM")
+            .doc(GYM_OWNER_EMAIL_ID)
+            .update({
+              members: querySnapshot.size.toString(),
+            })
+          }).then(() => {
+              console.log("Members count updated!");
+              navigation.replace("Members");
+            });
+        });
+    } else {
+      ToastAndroid.show(
+        "Name, email id and phone number are required",
+        ToastAndroid.SHORT
+      );
+    }
+  };
+
+  if (initializing) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView>
@@ -169,6 +261,7 @@ const AddMember = () => {
               onBlur={() => setIsFocus(false)}
               onChange={(item) => {
                 setSelectedPlan(item);
+                setDueAmount(item.amount - discount - amountPaid + "");
                 setIsFocus(false);
               }}
             />
@@ -225,7 +318,10 @@ const AddMember = () => {
         </View>
 
         <View style={styles.formBottom}>
-          <TouchableOpacity style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.buttonContainer}
+            onPress={addMemberToDB}
+          >
             <Text style={styles.buttonText}>Add Member</Text>
           </TouchableOpacity>
         </View>

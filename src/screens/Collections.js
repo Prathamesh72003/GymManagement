@@ -1,8 +1,17 @@
-import { ScrollView, StyleSheet, Text, View, Dimensions } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  ActivityIndicator,
+} from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 
 import { Divider } from "react-native-paper";
 import { PieChart } from "react-native-chart-kit";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import firestore from "@react-native-firebase/firestore";
 
 const chartConfig = {
   backgroundColor: "#fff",
@@ -82,12 +91,30 @@ const members = [
 ];
 
 const Collections = () => {
+  const [initializing, setInitializing] = useState(true);
   const [planCollection, setPlanCollection] = useState();
   const [serviceCollection, setServiceCollection] = useState();
-
-  const pie_chart_data = useRef([]);
+  const [pieChartData, setPieChartData] = useState([]);
 
   useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    // fetching members
+    const value = await AsyncStorage.getItem("GYM");
+
+    const members = await firestore()
+      .collection("GYM")
+      .doc(value)
+      .collection("MEMBERS")
+      .get();
+
+    // console.log(members.docs);
+    const membersArray = members.docs;
+
+    var discount = 0;
+
     var plan_full = 0;
     var plan_full_total = 0;
 
@@ -99,21 +126,37 @@ const Collections = () => {
     var plan_unpaid = 0;
     var plan_unpaid_total = 0;
 
-    plansSelectedTable.map((plan_details) => {
-      // checking if plan is completly paid
-      if (plan_details.amount == plan_details.amountPaid) {
-        plan_full += 1;
-        plan_full_total += plan_details.amount;
-      } else if (plan_details.amountPaid == 0 && plan_details.amount != 0) {
-        plan_unpaid += 1;
-        plan_unpaid_total += plan_details.amount;
-      } else {
-        plan_reminder += 1;
-        plan_reminder_total += plan_details.amount;
-        plan_reminder_received += plan_details.amountPaid;
-        plan_reminder_remaining +=
-          plan_details.amount - plan_details.amountPaid;
-      }
+    membersArray.map((member) => {
+      member._data.plans.map((plan_details) => {
+        plan_details = JSON.parse(plan_details);
+
+        plan_details.amount = parseInt(plan_details.amount);
+        plan_details.amountPaid = parseInt(plan_details.amountPaid);
+        plan_details.discount = parseInt(plan_details.discount);
+
+        discount += plan_details.discount;
+        console.log("plan_details: " + JSON.stringify(plan_details));
+        // checking if plan is completly paid
+        if (plan_details.amount == plan_details.amountPaid) {
+          plan_full += 1;
+          plan_full_total += plan_details.amount;
+        } else if (
+          plan_details.amountPaid == 0 &&
+          plan_details.amount != 0 &&
+          plan_details.discount != plan_details.amount
+        ) {
+          plan_unpaid += 1;
+          plan_unpaid_total += plan_details.amount;
+        } else {
+          plan_reminder += 1;
+          plan_reminder_total += plan_details.amount - plan_details.discount;
+          plan_reminder_received += plan_details.amountPaid;
+          plan_reminder_remaining +=
+            plan_details.amount -
+            plan_details.amountPaid -
+            plan_details.discount;
+        }
+      });
     });
 
     var resultPlan = {
@@ -143,24 +186,40 @@ const Collections = () => {
     var service_unpaid = 0;
     var service_unpaid_total = 0;
 
-    servicesSelectedTable.map((service_details) => {
-      // checking if plan is completly paid
-      if (service_details.amount == service_details.amountPaid) {
-        service_full += 1;
-        service_full_total += service_details.amount;
-      } else if (
-        service_details.amountPaid == 0 &&
-        service_details.amount != 0
-      ) {
-        service_unpaid += 1;
-        service_unpaid_total += service_details.amount;
-      } else {
-        service_reminder += 1;
-        service_reminder_total += service_details.amount;
-        service_reminder_received += service_details.amountPaid;
-        service_reminder_remaining +=
-          service_details.amount - service_details.amountPaid;
-      }
+    membersArray.map((member) => {
+      member._data.service.map((service_details) => {
+        // checking if plan is completly paid
+        service_details = JSON.parse(service_details);
+        console.log("service_details " + JSON.stringify(service_details));
+
+        service_details.amount = parseInt(service_details.amount);
+        service_details.amountPaid = parseInt(service_details.amountPaid);
+        service_details.discount = parseInt(service_details.discount);
+
+        discount += service_details.discount;
+
+        if (service_details.amount == service_details.amountPaid) {
+          service_full += 1;
+          service_full_total += service_details.amount;
+        } else if (
+          service_details.amountPaid == 0 &&
+          service_details.amount != 0 &&
+          service_details.discount != service_details.amount
+        ) {
+          service_unpaid += 1;
+          service_unpaid_total +=
+            service_details.amount - service_details.discount;
+        } else {
+          service_reminder += 1;
+          service_reminder_total +=
+            service_details.amount - service_details.discount;
+          service_reminder_received += service_details.amountPaid;
+          service_reminder_remaining +=
+            service_details.amount -
+            service_details.amountPaid -
+            service_details.discount;
+        }
+      });
     });
 
     var resultService = {
@@ -178,7 +237,31 @@ const Collections = () => {
     };
     setServiceCollection(resultService);
 
-    pie_chart_data.data = [
+    // pie_chart_data.data = [
+    //   {
+    //     name: "Received",
+    //     amount: resultPlan.received + resultService.received,
+    //     color: "#00FF00",
+    //     legendFontColor: "#7F7F7F",
+    //     legendFontSize: 15,
+    //   },
+    //   {
+    //     name: "Remaining",
+    //     amount: resultPlan.remaining + resultService.remaining,
+    //     color: "#F00",
+    //     legendFontColor: "#7F7F7F",
+    //     legendFontSize: 15,
+    //   },
+    //   {
+    //     name: "Discount",
+    //     amount: discount,
+    //     color: "#007ED6",
+    //     legendFontColor: "#7F7F7F",
+    //     legendFontSize: 15,
+    //   },
+    // ];
+
+    setPieChartData([
       {
         name: "Received",
         amount: resultPlan.received + resultService.received,
@@ -193,8 +276,31 @@ const Collections = () => {
         legendFontColor: "#7F7F7F",
         legendFontSize: 15,
       },
-    ];
-  }, []);
+      {
+        name: "Discount",
+        amount: discount,
+        color: "#007ED6",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15,
+      },
+    ]);
+    setInitializing(false);
+  };
+
+  if (initializing) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -207,9 +313,9 @@ const Collections = () => {
           <View style={styles.block}>
             <Text style={styles.blockTitle}>Overall collection</Text>
             <View style={styles.blockDivider} />
-            {pie_chart_data.data != null ? (
+            {pieChartData.length != 0 ? (
               <PieChart
-                data={pie_chart_data.data}
+                data={pieChartData}
                 width={Dimensions.get("window").width - 40}
                 height={220}
                 chartConfig={chartConfig}

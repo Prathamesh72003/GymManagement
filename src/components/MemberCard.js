@@ -44,9 +44,9 @@ const MemberCard = (props) => {
 
     plan_expiry =
       plan_expiry.getDate() +
-      " / " +
+      "/" +
       plan_expiry.getMonth() +
-      " / " +
+      "/" +
       plan_expiry.getFullYear();
   }
 

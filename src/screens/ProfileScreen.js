@@ -10,6 +10,7 @@ import { Avatar } from "react-native-paper";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileScreen = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
@@ -20,26 +21,19 @@ const ProfileScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [totalServices, setTotalServices] = useState("");
   const [totalPlans, setTotalPlans] = useState("");
-
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
+  const [totalMembers, setTotalMembers] = useState();
+  
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
+    fetchData();
   }, []);
 
-  if (initializing) return null;
+  async function fetchData() {
+    const value = await AsyncStorage.getItem("GYM");
+    console.log("function called");
 
-  if (!user) {
-    return navigation.replace("Login");
-  }
-
-  firestore()
+    firestore()
     .collection("GYM")
-    .doc(user.email)
+    .doc(value)
     .get()
     .then((documentSnapshot) => {
       if (documentSnapshot.exists) {
@@ -48,25 +42,12 @@ const ProfileScreen = ({ navigation }) => {
         setOwnername(documentSnapshot.data().owner);
         setPhone(documentSnapshot.data().phone);
         setEmail(documentSnapshot.data().email);
+        setTotalServices(documentSnapshot.data().services);
+        setTotalPlans(documentSnapshot.data().plans);
+        setTotalMembers(documentSnapshot.data().members);
       }
     });
-
-  firestore()
-    .collection("GYM")
-    .doc(user.email)
-    .collection("SERVICES")
-    .get()
-    .then((querySnapshot) => {
-      setTotalServices(querySnapshot.size);
-    });
-  firestore()
-    .collection("GYM")
-    .doc(user.email)
-    .collection("PLANS")
-    .get()
-    .then((querySnapshot) => {
-      setTotalPlans(querySnapshot.size);
-    });
+  }
   return (
     <ScrollView>
       <View styles={styles.container}>
@@ -119,7 +100,7 @@ const ProfileScreen = ({ navigation }) => {
                       color: "#2f50c9",
                     }}
                   >
-                    102
+                    {totalMembers}
                   </Text>
                   <Text style={styles.componentText}>Members</Text>
                 </View>
