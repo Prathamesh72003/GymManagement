@@ -18,6 +18,7 @@ const ServiceCard = (props) => {
   const deleteService = async () => {
     ToastAndroid.show("Processing request", ToastAndroid.SHORT);
     var id = props.data.service;
+
     const value = await AsyncStorage.getItem("GYM");
 
     firestore()
@@ -28,16 +29,10 @@ const ServiceCard = (props) => {
       .delete()
       .then(() => {
         ToastAndroid.show("Service successfully deleted !", ToastAndroid.SHORT);
-        firestore().collection("GYM").doc(value).collection("SERVICES").get().then(querySnapshot => {
-          firestore()
-          .collection("GYM")
-          .doc(value)
-          .update({
-            services: querySnapshot.size.toString(),
-          })
-        }).then(() => {
-            console.log("service count updated!");
-          });
+        const decrement = firestore.FieldValue.increment(-1);
+        firestore().collection("GYM").doc(value).update({
+          services: decrement,
+        });
         navigation.replace("Services");
       });
   };

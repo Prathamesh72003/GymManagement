@@ -50,9 +50,9 @@ const SignupScreen = ({ navigation }) => {
               phone: phone,
               password: password,
               date: new Date(),
-              plans: "",
-              services: "",
-              members: "",
+              plans: "0",
+              services: "0",
+              members: "0",
             })
             .then(() => {
               console.log("User added to firebase");

@@ -117,6 +117,8 @@ const AddMember = ({ navigation }) => {
         service: [],
       };
 
+      const increment = firestore.FieldValue.increment(1);
+
       firestore()
         .collection("GYM")
         .doc(GYM_OWNER_EMAIL_ID)
@@ -124,17 +126,12 @@ const AddMember = ({ navigation }) => {
         .add(data)
         .then(() => {
           ToastAndroid.show("Member added successfully !", ToastAndroid.SHORT);
-          firestore().collection("GYM").doc(GYM_OWNER_EMAIL_ID).collection("MEMBERS").get().then(querySnapshot => {
-            firestore()
-            .collection("GYM")
-            .doc(GYM_OWNER_EMAIL_ID)
-            .update({
-              members: querySnapshot.size.toString(),
-            })
-          }).then(() => {
-              console.log("Members count updated!");
-              navigation.replace("Members");
-            });
+
+          firestore().collection("GYM").doc(GYM_OWNER_EMAIL_ID).update({
+            members: increment,
+          });
+
+          navigation.replace("Members");
         });
     } else {
       ToastAndroid.show(

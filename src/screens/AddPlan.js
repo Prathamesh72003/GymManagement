@@ -12,6 +12,7 @@ import { TextInput, RadioButton } from "react-native-paper";
 import { Dropdown } from "react-native-element-dropdown";
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const data = [
   { label: "1 month", value: "1" },
@@ -22,43 +23,48 @@ const data = [
   { label: "6 month", value: "6" },
   { label: "7 month", value: "7" },
   { label: "8 month", value: "8" },
+  { label: "11 month", value: "11" },
+  { label: "12 month", value: "12" },
+  { label: "13 month", value: "13" },
+  { label: "14 month", value: "14" },
+  { label: "15 month", value: "15" },
+  { label: "16 month", value: "16" },
+  { label: "17 month", value: "17" },
+  { label: "18 month", value: "18" },
 ];
 
 const AddPlan = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState("");
   const [planName, setPlanName] = useState("");
-  const [amount, setAmount] = useState();
+  const [amount, setAmount] = useState("");
   const [durationType, setDurationType] = useState("Month");
-  const [days, setDays] = useState();
-  const [months, setMonths] = useState();
+  const [days, setDays] = useState("");
+  const [months, setMonths] = useState("");
   const [isFocus, setIsFocus] = useState(false);
   const [plancount, setPlancount] = useState();
 
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  });
-
-  if (initializing) return null;
-
-  if (!user) {
-    return navigation.replace("Login");
-  }
+  useEffect(() => {}, []);
 
   const AddPlanToDb = async () => {
-    if (
-      (planName.length == 0 &&
-        amount.length == 0 &&
-        durationType.length == 0 &&
-        days.length == 0 ||
-      months.length == 0)
-    ) {
+    const value = await AsyncStorage.getItem("GYM");
+
+    if (durationType == "Month" && months.length == 0) {
+      ToastAndroid.show(
+        "Select number of months",
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
+      );
+      // console.log("Select number of months");
+    } else if (durationType == "Days" && days.length == 0) {
+      // console.log("Enter number of days");
+      ToastAndroid.show(
+        "Enter number of days",
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
+      );
+    } else if (planName.length == 0 && amount.length == 0) {
+      // console.log("All fields are required");
       ToastAndroid.show(
         "All fields required",
         ToastAndroid.SHORT,
@@ -72,9 +78,11 @@ const AddPlan = ({ navigation }) => {
         duration = days;
       }
 
+      const increment = firestore.FieldValue.increment(1);
+
       await firestore()
         .collection("GYM")
-        .doc(user.email)
+        .doc(value)
         .collection("PLANS")
         .doc(planName)
         .set({
@@ -86,28 +94,18 @@ const AddPlan = ({ navigation }) => {
           date: new Date(),
         })
         .then(() => {
-          console.log("Plan added to firebase");         
-          firestore().collection("GYM").doc(user.email).collection("PLANS").get().then(querySnapshot => {
-            firestore()
-            .collection("GYM")
-            .doc(user.email)
-            .update({
-              plans: querySnapshot.size.toString(),
-            })
-          }).then(() => {
-              console.log("Plan count updated!");
-            });
-            setPlanName("");
-            setAmount("");
-            setMonths();
-            setDays();
-            navigation.navigate("Plans")
+          ToastAndroid.show("Plan added successfully !", ToastAndroid.SHORT);
+
+          firestore().collection("GYM").doc(value).update({
+            plans: increment,
+          });
+
+          setPlanName("");
+          setAmount("");
+          setMonths();
+          setDays();
+          navigation.replace("Plans");
         });
-      ToastAndroid.show(
-        "Plan added successfully!",
-        ToastAndroid.LONG,
-        ToastAndroid.CENTER
-      );
     }
   };
 
@@ -214,7 +212,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonContainer: {
-    padding: 20,
+    padding: 10,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",

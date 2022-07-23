@@ -6,6 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
+
 import { Avatar } from "react-native-paper";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import auth from "@react-native-firebase/auth";
@@ -22,7 +23,7 @@ const ProfileScreen = ({ navigation }) => {
   const [totalServices, setTotalServices] = useState("");
   const [totalPlans, setTotalPlans] = useState("");
   const [totalMembers, setTotalMembers] = useState();
-  
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -32,22 +33,28 @@ const ProfileScreen = ({ navigation }) => {
     console.log("function called");
 
     firestore()
-    .collection("GYM")
-    .doc(value)
-    .get()
-    .then((documentSnapshot) => {
-      if (documentSnapshot.exists) {
-        // console.log('User data: ', documentSnapshot.data());
-        setGymname(documentSnapshot.data().gymname);
-        setOwnername(documentSnapshot.data().owner);
-        setPhone(documentSnapshot.data().phone);
-        setEmail(documentSnapshot.data().email);
-        setTotalServices(documentSnapshot.data().services);
-        setTotalPlans(documentSnapshot.data().plans);
-        setTotalMembers(documentSnapshot.data().members);
-      }
-    });
+      .collection("GYM")
+      .doc(value)
+      .get()
+      .then((documentSnapshot) => {
+        if (documentSnapshot.exists) {
+          // console.log('User data: ', documentSnapshot.data());
+          setGymname(documentSnapshot.data().gymname);
+          setOwnername(documentSnapshot.data().owner);
+          setPhone(documentSnapshot.data().phone);
+          setEmail(documentSnapshot.data().email);
+          setTotalServices(documentSnapshot.data().services);
+          setTotalPlans(documentSnapshot.data().plans);
+          setTotalMembers(documentSnapshot.data().members);
+        }
+      });
   }
+
+  const logout = async () => {
+    await AsyncStorage.removeItem("GYM");
+    navigation.replace("Login");
+  };
+
   return (
     <ScrollView>
       <View styles={styles.container}>
@@ -196,16 +203,7 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  auth()
-                    .signOut()
-                    .then(() => {
-                      // console.log('done');
-                      navigation.replace("Login");
-                    });
-                }}
-              >
+              <TouchableOpacity onPress={logout}>
                 <View style={styles.listItem}>
                   <View style={styles.Icon}>
                     <FontAwesome5

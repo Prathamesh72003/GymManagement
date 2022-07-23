@@ -10,17 +10,21 @@ import React, { useState } from "react";
 import Entypo from "react-native-vector-icons/Entypo";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import { Menu, Button, Divider, Provider } from "react-native-paper";
+import { useNavigation } from '@react-navigation/native';
 
 const data = [];
 
 const MemberCard = (props) => {
+
+  const navigation = useNavigation();
+
   const [visible, setVisible] = useState(true);
 
   const openMenu = () => setVisible(true);
 
   const closeMenu = () => setVisible(false);
 
-  const { id, email_id, gender, phone_no, joining_date, plans, service, name } =
+  const { id, email_id, gender, phone_no, joining_date, plans, service, name, injury,address,dob } =
     props.data;
 
   // const plans_data = JSON.parse(plans);
@@ -72,7 +76,7 @@ const MemberCard = (props) => {
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => {
-          console.log("presses");
+          navigation.navigate("MemberDetails", {data: props.data})
         }}
       >
         <View style={styles.memberCard}>

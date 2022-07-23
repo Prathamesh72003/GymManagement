@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   ToastAndroid,
 } from "react-native";
-import React,{ useState} from "react";
+import React, { useState } from "react";
 
 import AntDesign from "react-native-vector-icons/AntDesign";
 import firestore from "@react-native-firebase/firestore";
@@ -20,6 +20,7 @@ const PlanCard = (props) => {
   const deletePlan = async () => {
     ToastAndroid.show("Processing request", ToastAndroid.SHORT);
     var id = props.data.plan;
+
     const value = await AsyncStorage.getItem("GYM");
 
     firestore()
@@ -30,16 +31,10 @@ const PlanCard = (props) => {
       .delete()
       .then(() => {
         ToastAndroid.show("Plan successfully deleted !", ToastAndroid.SHORT);
-        firestore().collection("GYM").doc(value).collection("PLANS").get().then(querySnapshot => {
-          firestore()
-          .collection("GYM")
-          .doc(value)
-          .update({
-            plans: querySnapshot.size.toString(),
-          })
-        }).then(() => {
-            console.log("Plan count updated!");
-          });
+        const decrement = firestore.FieldValue.increment(-1);
+        firestore().collection("GYM").doc(value).update({
+          plans: decrement,
+        });
         navigation.replace("Plans");
       });
   };

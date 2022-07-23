@@ -34,12 +34,18 @@ const data = [
   },
 ];
 
-const Members = ({ navigation }) => {
+const Members = ({ route, navigation }) => {
   const [membersData, setMembersData] = useState([]);
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    getMembers();
+    console.log(route.params);
+    if (route.params == null) {
+      getMembers();
+    } else {
+      setMembersData(route.params.membersData);
+      setInitializing(false);
+    }
   }, []);
 
   const getMembers = async () => {
@@ -63,6 +69,9 @@ const Members = ({ navigation }) => {
               plans,
               service,
               name,
+              injury,
+              address,
+              dob
             } = doc.data();
             membersList.push({
               id,
@@ -73,6 +82,9 @@ const Members = ({ navigation }) => {
               plans,
               service,
               name,
+              injury,
+              address,
+              dob
             });
           });
         });
@@ -104,10 +116,26 @@ const Members = ({ navigation }) => {
     >
       <Provider>
         <View style={styles.body}>
-          {membersData.map((item) => {
-            console.log(item.name);
-            return <MemberCard key={item.id} data={item} />;
-          })}
+          {membersData.length == 0 ? (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                flex: 1,
+                backgroundColor: "#fff",
+              }}
+            >
+              <Text style={{ fontSize: 20, fontWeight: "700" }}>
+                No members found
+              </Text>
+            </View>
+          ) : (
+            membersData.map((item) => {
+              console.log(item.name);
+              return <MemberCard key={item.id} data={item} />;
+            })
+          )}
+
           <FAB
             color={"#fff"}
             icon="plus"

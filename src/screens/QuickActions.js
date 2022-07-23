@@ -5,12 +5,139 @@ import {
   Dimensions,
   View,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
+
 import Card from "../components/Card";
 import CardWithImage from "../components/CardWithImage";
+import firestore from "@react-native-firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const QuickAction = () => {
+  const [initializing, setInitializing] = useState(true);
+  const [nearTermExpriy, setNearTermExpriy] = useState([]);
+  const [totalMemberList, setTotalMemberList] = useState([]);
+  const [activeMemberList, setActiveMemberList] = useState([]);
+  const [expiredMemberList, setExpiredMemberList] = useState([]);
+  const [blockMemberList, setBlockMemberList] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    const value = await AsyncStorage.getItem("GYM");
+
+    const membersList = [];
+    await firestore()
+      .collection("GYM")
+      .doc(value)
+      .collection("MEMBERS")
+      .get()
+      .then((result) => {
+        result.forEach((doc) => {
+          const {
+            id,
+            email_id,
+            gender,
+            phone_no,
+            joining_date,
+            plans,
+            service,
+            name,
+          } = doc.data();
+          membersList.push({
+            id,
+            email_id,
+            gender,
+            phone_no,
+            joining_date,
+            plans,
+            service,
+            name,
+          });
+        });
+      });
+
+    // console.log(membersList);
+
+    var near_term_expriy_member = [];
+    var active_member = [];
+    var expired_member = [];
+    var block_member = [];
+
+    membersList.map((member) => {
+      if (member.block == true) {
+        block_member.push(member);
+      } else {
+        var plans = member.plans;
+        var res = find_if_expired(plans);
+
+        if (res == true) {
+          expired_member.push(member);
+        } else {
+          var d = new Date();
+          d = d.setDate(d.getDate() + 10);
+          console.log(res, new Date(d));
+          if (res < d) {
+            near_term_expriy_member.push(member);
+          }
+          active_member.push(member);
+        }
+      }
+    });
+
+    setNearTermExpriy(near_term_expriy_member);
+    setTotalMemberList(membersList);
+    setActiveMemberList(active_member);
+    setExpiredMemberList(expired_member);
+    setBlockMemberList(block_member);
+
+    setInitializing(false);
+  };
+
+  const find_if_expired = (plans) => {
+    var plan_expiry = "";
+    if (plans.length != 0) {
+      var latest_plan = JSON.parse(plans[plans.length - 1]);
+      var plan_start = latest_plan.date;
+      var duration = parseInt(latest_plan.duration);
+      plan_start = new Date(plan_start);
+
+      if (latest_plan.durationType == "Month") {
+        plan_expiry = new Date(
+          plan_start.setMonth(plan_start.getMonth() + duration)
+        );
+      } else {
+        plan_expiry = new Date(
+          plan_start.setDate(plan_start.getDate() + duration)
+        );
+      }
+    }
+    // console.log(plan_expiry);
+    if (plan_expiry < new Date()) {
+      return true;
+    } else {
+      return plan_expiry;
+    }
+  };
+
+  if (initializing) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <View styles={styles.container}>
       <ScrollView>
@@ -21,7 +148,8 @@ const QuickAction = () => {
           <View style={styles.row}>
             <Card
               width={"100%"}
-              count={10}
+              count={nearTermExpriy.length}
+              membersData={nearTermExpriy}
               title={"Near term expiry"}
               intent={"Members"}
             />
@@ -30,19 +158,33 @@ const QuickAction = () => {
             Members
           </Text>
           <View style={styles.row}>
-            <Card width={"47%"} count={3} title={"Total"} intent={"Members"} />
-            <Card width={"47%"} count={2} title={"Active"} intent={"Members"} />
+            <Card
+              width={"47%"}
+              count={totalMemberList.length}
+              membersData={totalMemberList}
+              title={"Total"}
+              intent={"Members"}
+            />
+            <Card
+              width={"47%"}
+              count={activeMemberList.length}
+              membersData={activeMemberList}
+              title={"Active"}
+              intent={"Members"}
+            />
           </View>
           <View style={styles.row}>
             <Card
               width={"47%"}
-              count={2}
+              count={expiredMemberList.length}
+              membersData={expiredMemberList}
               title={"Expired"}
               intent={"Members"}
             />
             <Card
               width={"47%"}
-              count={2}
+              count={blockMemberList.length}
+              membersData={blockMemberList}
               title={"Blocked"}
               intent={"Members"}
             />
@@ -55,7 +197,7 @@ const QuickAction = () => {
               width={"30%"}
               icon={"user"}
               title={"Members"}
-              intent={"Members"}
+              intent={"AddMember"}
             />
             <CardWithImage
               width={"30%"}

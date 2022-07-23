@@ -4,79 +4,50 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  ToastAndroid
+  ToastAndroid,
 } from "react-native";
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 
 import { TextInput, RadioButton } from "react-native-paper";
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const AddService = ({navigation}) => {
+const AddService = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [amount, setAmount] = useState();
-  
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
 
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
-
-  if (initializing) return null;
-
-  if (!user) {
-    return navigation.replace('Login');
-  }
+  useEffect(() => {}, []);
 
   const AddServiceToDb = async () => {
     if (serviceName.length == 0 && amount.length == 0) {
-      ToastAndroid.show(
-        'All fields required',
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
-      );
-    }else{
-      await firestore().collection('GYM').doc(user.email).collection('SERVICES').doc(serviceName).set({
-        service: serviceName,
-        amount: amount,
-      }).then(()=>{
-        console.log("Service added to firebase");
-        firestore()
-          .collection("GYM")
-          .doc(user.email)
-            .update({
-              services: 31,
-            })
-            .then(() => {
-              console.log("Service count updated!");
-              firestore().collection("GYM").doc(user.email).collection("SERVICES").get().then(querySnapshot => {
-                firestore()
-                .collection("GYM")
-                .doc(user.email)
-                .update({
-                  services: querySnapshot.size.toString(),
-                })
-              }).then(() => {
-                  console.log("Plan count updated!");
-                  setServiceName("");
-                  setAmount("");
-                  navigation.navigate("Services");
-                });
-            });
-      })
-      ToastAndroid.show(
-        'Service added successfully!',
-        ToastAndroid.LONG,
-        ToastAndroid.CENTER,
-      );
+      ToastAndroid.show("All fields required", ToastAndroid.SHORT);
+    } else {
+      const value = await AsyncStorage.getItem("GYM");
+
+      await firestore()
+        .collection("GYM")
+        .doc(value)
+        .collection("SERVICES")
+        .doc(serviceName)
+        .set({
+          service: serviceName,
+          amount: amount,
+        })
+        .then(() => {
+          ToastAndroid.show("Service added successfully !", ToastAndroid.SHORT);
+
+          const increment = firestore.FieldValue.increment(1);
+          firestore().collection("GYM").doc(value).update({
+            services: increment,
+          });
+
+          navigation.replace("Services");
+        });
     }
-  }
+  };
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
@@ -100,7 +71,10 @@ const AddService = ({navigation}) => {
           />
         </View>
         <View style={styles.formBottom}>
-          <TouchableOpacity style={styles.buttonContainer} onPress={() => AddServiceToDb()}>
+          <TouchableOpacity
+            style={styles.buttonContainer}
+            onPress={() => AddServiceToDb()}
+          >
             <Text style={styles.buttonText}>Add service</Text>
           </TouchableOpacity>
         </View>
@@ -128,7 +102,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonContainer: {
-    padding: 15,
+    padding: 10,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",

@@ -11,7 +11,14 @@ const Card = (props) => {
     >
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate(props.intent);
+          if (props.membersData) {
+            navigation.navigate(props.intent, {
+              membersData: props.membersData,
+              loaded: true,
+            });
+          } else {
+            navigation.navigate(props.intent);
+          }
         }}
       >
         <View style={styles.cardTop}>
