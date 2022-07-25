@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ToastAndroid,
+  Image,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
@@ -14,9 +15,15 @@ import { Dropdown } from "react-native-element-dropdown";
 import DatePicker from "react-native-datepicker";
 import firestore from "@react-native-firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const AddMember = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
+
+  const [profileImg, setProfileImg] = useState(
+    "https://www.kindpng.com/picc/m/173-1731325_person-icon-png-transparent-png.png"
+  );
+
   const [name, setName] = useState("");
   const [phoneNO, setPhoneNO] = useState("");
   const [emailID, setEmailID] = useState("");
@@ -30,6 +37,10 @@ const AddMember = ({ navigation }) => {
   const [amountPaid, setAmountPaid] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [dueAmount, setDueAmount] = useState();
+
+  const [dob, setDob] = useState(new Date());
+  const [address, setAddress] = useState("");
+  const [injury, setInjury] = useState("");
 
   useEffect(() => {
     fetchPlans();
@@ -113,6 +124,9 @@ const AddMember = ({ navigation }) => {
         joining_date: joiningDate,
         name: name,
         phone_no: phoneNO,
+        dob: dob,
+        address: address,
+        injury: injury,
         plans: plans_array,
         service: [],
       };
@@ -124,12 +138,20 @@ const AddMember = ({ navigation }) => {
         .doc(GYM_OWNER_EMAIL_ID)
         .collection("MEMBERS")
         .add(data)
-        .then(() => {
+        .then((ref) => {
           ToastAndroid.show("Member added successfully !", ToastAndroid.SHORT);
-
+          var id = ref._documentPath._parts[3];
           firestore().collection("GYM").doc(GYM_OWNER_EMAIL_ID).update({
             members: increment,
           });
+          firestore()
+            .collection("GYM")
+            .doc(GYM_OWNER_EMAIL_ID)
+            .collection("MEMBERS")
+            .doc(id)
+            .update({
+              id: id,
+            });
 
           navigation.replace("Members");
         });
@@ -140,6 +162,51 @@ const AddMember = ({ navigation }) => {
       );
     }
   };
+
+  // const storeImgInStorage = async () => {};
+
+  // const imageOptions = {
+  //   mediaType: "photo",
+  //   includeBase64: false,
+  // };
+
+  // const takeImgFromFile = async () => {
+  //   const result = await launchImageLibrary(imageOptions);
+  //   console.log(result);
+  //   if (result.didCancel != null) {
+  //     ToastAndroid.show("File not selected", ToastAndroid.SHORT);
+  //   } else if (result.errorMessage != null) {
+  //     ToastAndroid.show("" + result.errorMessage, ToastAndroid.SHORT);
+  //   } else {
+  //     if (result.assets[0].fileSize <= 1000000) {
+  //       setProfileImg(result.assets[0].uri);
+  //     } else {
+  //       ToastAndroid.show(
+  //         "Image size should be less than 1 MB",
+  //         ToastAndroid.LONG
+  //       );
+  //     }
+  //   }
+  // };
+  // const takeImgFromCamera = async () => {
+  //   const result = await launchCamera(imageOptions);
+
+  //   if (result.didCancel != null) {
+  //     ToastAndroid.show("File not selected", ToastAndroid.SHORT);
+  //   } else if (result.errorMessage != null) {
+  //     ToastAndroid.show("" + result.errorMessage, ToastAndroid.SHORT);
+  //   } else {
+  //     if (result.assets[0].fileSize <= 1000000) {
+  //       setProfileImg(result.assets[0].uri);
+  //     } else {
+  //       ToastAndroid.show(
+  //         "Image size should be less than 1 MB",
+  //         ToastAndroid.LONG
+  //       );
+  //     }
+  //     // console.log(result.assets[0].uri);
+  //   }
+  // };
 
   if (initializing) {
     return (
@@ -159,6 +226,35 @@ const AddMember = ({ navigation }) => {
   return (
     <ScrollView>
       <View style={styles.container}>
+        {/* <View style={styles.imagePickerContainer}>
+          <View style={styles.imageContainer}>
+            <Image
+              source={{
+                uri: profileImg,
+              }}
+              style={styles.image}
+            />
+          </View>
+          <View style={styles.imageUploadOptions}>
+            <TouchableOpacity onPress={takeImgFromFile}>
+              <AntDesign
+                style={{ paddingHorizontal: 15 }}
+                name="upload"
+                size={20}
+                color="#000"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={takeImgFromCamera}>
+              <AntDesign
+                style={{ paddingHorizontal: 15 }}
+                name="camera"
+                size={20}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+        </View> */}
+
         {/* member details block */}
         <View style={styles.block}>
           <Text style={styles.blockTitle}>Member details</Text>
@@ -205,6 +301,9 @@ const AddMember = ({ navigation }) => {
             </View>
 
             <View style={styles.row}>
+              <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                Joining date
+              </Text>
               <DatePicker
                 style={{ width: 200 }}
                 date={joiningDate}
@@ -217,13 +316,11 @@ const AddMember = ({ navigation }) => {
                 cancelBtnText="Cancel"
                 customStyles={{
                   dateIcon: {
-                    position: "absolute",
-                    left: 0,
-                    top: 4,
-                    marginLeft: 0,
+                    height: 0,
+                    width: 0,
                   },
                   dateInput: {
-                    marginLeft: 36,
+                    marginLeft: 16,
                     width: "100%",
                   },
                   // ... You can check the source to find the other keys.
@@ -314,6 +411,59 @@ const AddMember = ({ navigation }) => {
           </View>
         </View>
 
+        {/* other details block */}
+        <View style={styles.block}>
+          <Text style={styles.blockTitle}>Other details</Text>
+          <View style={styles.form}>
+            <View style={styles.row}>
+              <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                Date of Birth
+              </Text>
+              <DatePicker
+                style={{ width: 200 }}
+                date={dob}
+                mode="date"
+                placeholder="select date"
+                format="YYYY-MM-DD"
+                confirmBtnText="Confirm"
+                cancelBtnText="Cancel"
+                customStyles={{
+                  dateIcon: {
+                    height: 0,
+                    width: 0,
+                  },
+                  dateInput: {
+                    marginLeft: 16,
+                    width: "100%",
+                  },
+                  // ... You can check the source to find the other keys.
+                }}
+                onDateChange={(date) => {
+                  setDob(date);
+                }}
+              />
+            </View>
+            <View style={styles.row}>
+              <TextInput
+                multiline
+                label="Enter address"
+                style={styles.input}
+                value={address}
+                onChangeText={(text) => setAddress(text)}
+              />
+            </View>
+            <View style={styles.row}>
+              <TextInput
+                multiline
+                label="Enter any injuries"
+                style={styles.input}
+                value={injury}
+                onChangeText={(text) => setInjury(text)}
+              />
+            </View>
+          </View>
+        </View>
+
         <View style={styles.formBottom}>
           <TouchableOpacity
             style={styles.buttonContainer}
@@ -349,6 +499,40 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
+  },
+
+  imagePickerContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  imageContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 150,
+    height: 150,
+    borderRadius: 150,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+    overflow: "hidden",
+  },
+  image: {
+    width: 150,
+    height: 150,
+    borderRadius: 50,
+    resizeMode: "cover",
+  },
+  imageUploadOptions: {
+    display: "flex",
+    flexDirection: "row",
+    marginTop: 10,
   },
 
   input: {

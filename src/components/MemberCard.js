@@ -24,8 +24,7 @@ const MemberCard = (props) => {
 
   const closeMenu = () => setVisible(false);
 
-  const { id, email_id, gender, phone_no, joining_date, plans, service, name, injury,address,dob } =
-    props.data;
+  const { id, email_id, gender, phone_no, joining_date, plans, service, name, injury,address,dob } = props.data;
 
   // const plans_data = JSON.parse(plans);
 

@@ -20,6 +20,8 @@ import Services from "./src/screens/Services";
 import AddMember from "./src/screens/AddMember";
 import Collections from "./src/screens/Collections";
 import MemberDetails from "./src/screens/MemberDetails";
+import AddPlanToMember from "./src/screens/AddPlanToMember";
+import AddServiceToMember from "./src/screens/AddServiceToMember";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -153,6 +155,16 @@ const App = () => {
           options={{ headerShown: true }}
           name="MemberDetails"
           component={MemberDetails}
+        />
+        <Stack.Screen
+          options={{ headerShown: true }}
+          name="AddPlanToMember"
+          component={AddPlanToMember}
+        />
+        <Stack.Screen
+          options={{ headerShown: true }}
+          name="AddServiceToMember"
+          component={AddServiceToMember}
         />
       </Stack.Navigator>
     </NavigationContainer>

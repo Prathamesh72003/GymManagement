@@ -4,9 +4,10 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  ToastAndroid
+  ToastAndroid,
+  ScrollView
 } from "react-native";
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import {
   Avatar,
   Button,
@@ -15,37 +16,63 @@ import {
   Paragraph,
   RadioButton,
 } from "react-native-paper";
+import firestore from "@react-native-firebase/firestore";
+
+const names = [
+  "Infinit",
+  "Bility",
+  "Infinitbility",
+  "Infinit",
+  "Bility",
+  "Infinitbility",
+  "Infinit",
+  "Bility",
+  "Infinitbility",
+];
 
 const Subscription = () => {
+  const [plan, setPlan] = useState();
+  const [price, setPrice] = useState("0");
+  const [subs, setSubs] = useState([]);
 
-  const [plan, setPlan] = useState(12)
+  useEffect(() => {
+    const getSubs = async () => {
+      const subsList = [];
+      await firestore()
+        .collection("SUBSCRIPTIONS")
+        .get()
+        .then((result) => {
+          result.forEach((doc) => {
+            const { desc, discounted_price, name, org_price,id } = doc.data();
+            subsList.push({
+              desc,
+              discounted_price,
+              name,
+              org_price,
+              id
+            });
+          });
+        });
+      setSubs(subsList);
+    };
 
-  // const PlanPrice = () => {
-  //   if (plan == 12) {
-  //     setPrice(12000);
-  //   }else if(plan == 6){
-  //     setPrice(6000);
-  //   }else if(plan == 1){
-  //     setPrice(200);
-  //   }
-  // }
+    getSubs();
+  }, []);
 
   const Payment = () => {
     if (plan == null) {
+      ToastAndroid.show("Select a plan", ToastAndroid.SHORT);
+    } else {
       ToastAndroid.show(
-        "Select a plan",
-        ToastAndroid.SHORT,
-      );
-    }else{
-      ToastAndroid.show(
-        "Proccessing a payment for the "+plan+" months",
-        ToastAndroid.SHORT,
+        "Proccessing a payment for the " + plan + " months",
+        ToastAndroid.SHORT
       );
     }
-  }
-
+  };
+  
   return (
-    <View style={styles.mainContainer}>
+    <ScrollView>
+      <View style={styles.mainContainer}>
       <View style={styles.headingContainer}>
         <Text style={styles.TitleText}>Be the part of huge community!</Text>
         <Text style={styles.SubtitleText}>
@@ -55,123 +82,43 @@ const Subscription = () => {
 
       <View style={styles.MiddleContainer}>
         <View style={styles.cardsContainer}>
-          <TouchableOpacity activeOpacity={0.9} onPress={() => setPlan(12)} style={[styles.Card,{ borderWidth: plan == 12 ? 4 : 0, borderColor: plan == 12 ? 'green' : 'grey',elevation: plan == 12 ? 5 : 2}]}>
-            <Card>
-              <Card.Title
-                title="Rs. 12000"
-                subtitle="Yearly Subscription"
-                // left={LeftContent}
-              />
-              <Card.Content>
-                <View style={styles.features}>
-                  <FlatList
-                    data={[
-                      { key: "Cardio" },
-                      { key: "Swimming" },
-                      { key: "Weightlifting" },
-                    ]}
-                    renderItem={({ item }) => (
-                      <Text style={styles.item}>
-                        {"✔️" + " "}
-                        {item.key}
-                      </Text>
-                    )}
+          {subs.map((item, index) => {
+            return (
+              <TouchableOpacity
+                key={index}
+                activeOpacity={0.9}
+                onPress={() => {setPlan(item.id),setPrice(item.discounted_price)}}
+                style={[
+                  styles.Card,
+                  {
+                    borderWidth: plan == item.id ? 4 : 0 ,
+                    borderColor: plan == item.id ? "green" : "grey",
+                    elevation: plan == item.id ? 5 : 2,
+                  },
+                ]}
+              >
+                <Card>
+                  <Card.Title
+                    title={"Rs." + item.discounted_price}
+                    subtitle={item.name+" Plan"}
+                    // left={LeftContent}
                   />
-                  <FlatList
-                    data={[
-                      { key: "Cardio" },
-                      { key: "Swimming" },
-                      { key: "Weightlifting" },
-                    ]}
-                    renderItem={({ item }) => (
-                      <Text style={styles.item}>
-                        {"✔️" + " "}
-                        {item.key}
-                      </Text>
-                    )}
-                  />
-                </View>
-              </Card.Content>
-            </Card>
-          </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.9} onPress={() => setPlan(6)} style={[styles.Card,{ borderWidth: plan == 6 ? 4 : 0, borderColor: plan == 6 ? 'green' : 'grey',elevation: plan == 6 ? 5 : 2}]}>
-            <Card>
-              <Card.Title
-                title="Rs. 600"
-                subtitle="Half year subscription"
-                // left={LeftContent}
-              />
-              <Card.Content>
-                <View style={styles.features}>
-                  <FlatList
-                    data={[
-                      { key: "Cardio" },
-                      { key: "Swimming" },
-                      { key: "Weightlifting" },
-                    ]}
-                    renderItem={({ item }) => (
-                      <Text style={styles.item}>
-                        {"✔️" + " "}
-                        {item.key}
-                      </Text>
-                    )}
-                  />
-                  <FlatList
-                    data={[
-                      { key: "Cardio" },
-                      { key: "Swimming" },
-                      { key: "Weightlifting" },
-                    ]}
-                    renderItem={({ item }) => (
-                      <Text style={styles.item}>
-                        {"❌" + " "}
-                        {item.key}
-                      </Text>
-                    )}
-                  />
-                </View>
-              </Card.Content>
-            </Card>
-          </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.9} onPress={() => setPlan(1)} style={[styles.Card,{ borderWidth: plan == 1 ? 4 : 0, borderColor: plan == 1 ? 'green' : 'grey', elevation: plan == 1 ? 5 : 2}]}>
-            <Card>
-              <Card.Title
-                title="Rs. 200"
-                subtitle="One month subscription"
-                // left={LeftContent}
-              />
-              <Card.Content>
-                <View style={styles.features}>
-                  <FlatList
-                    data={[
-                      { key: "Cardio" },
-                      { key: "Swimming" },
-                      { key: "Weightlifting" },
-                    ]}
-                    renderItem={({ item }) => (
-                      <Text style={styles.item}>
-                        {"✔️" + " "}
-                        {item.key}
-                      </Text>
-                    )}
-                  />
-                  <FlatList
-                    data={[
-                      { key: "Cardio" },
-                      { key: "Swimming" },
-                      { key: "Weightlifting" },
-                    ]}
-                    renderItem={({ item }) => (
-                      <Text style={styles.item}>
-                        {"❌" + " "}
-                        {item.key}
-                      </Text>
-                    )}
-                  />
-                </View>
-              </Card.Content>
-            </Card>
-          </TouchableOpacity>
+                  <Card.Content>
+                    <View style={styles.features}>
+                      {item.desc.map((item1, index) => {
+                        return (
+                          <Text key={index} numberOfLines={1} style={{width: '50%', marginBottom: 5}}>
+                            {"✔️" + " "}
+                            {item1}
+                          </Text>
+                        );
+                      })}
+                    </View>
+                  </Card.Content>
+                </Card>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
 
@@ -181,11 +128,15 @@ const Subscription = () => {
           mode="contained"
           onPress={() => Payment()}
         >
-          Buy Subscription
+          Checkout Plan
         </Button>
-        
+
+        <Text style={styles.total}>
+          Total Rs. {price}
+        </Text>
       </View>
     </View>
+    </ScrollView>
   );
 };
 
@@ -216,15 +167,27 @@ const styles = StyleSheet.create({
     borderColor: "grey",
   },
   features: {
-    display: "flex",
+    // flex: 1,
     flexDirection: "row",
+    flexWrap: "wrap",
   },
   footerContainer: {
+    display: "flex",
     flex: 1,
-    justifyContent: "flex-end",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 30, 
+    marginBottom: 10, 
+
   },
   PurchaseButton: {
-    width: "100%",
-    backgroundColor: "#2f50c9"
+    backgroundColor: "#2f50c9",
+  },
+  total:{
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#2f50c9"
   },
 });
