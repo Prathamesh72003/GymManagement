@@ -6,6 +6,7 @@ import {
   View,
   ScrollView,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import Card from "../components/Card";
@@ -40,30 +41,38 @@ const HomeScreen = ({ navigation }) => {
   const [totalMembers, setTotalMembers] = useState();
   const [chartLoading, setChartLoading] = useState(true);
   const [chartData, setChartData] = useState();
+  const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchData();
+  }, []);
+
   async function fetchData() {
+    setInitializing(true);
     const value = await AsyncStorage.getItem("GYM");
-    console.log("function called");
+    // console.log("function called");
 
     firestore()
-    .collection("GYM")
-    .doc(value)
-    .get()
-    .then((documentSnapshot) => {
-      if (documentSnapshot.exists) {
-        setTotalServices(documentSnapshot.data().services);
-        setTotalPlans(documentSnapshot.data().plans);
-        setTotalMembers(documentSnapshot.data().members);
-      }
-    });
+      .collection("GYM")
+      .doc(value)
+      .get()
+      .then((documentSnapshot) => {
+        if (documentSnapshot.exists) {
+          setTotalServices(documentSnapshot.data().services);
+          setTotalPlans(documentSnapshot.data().plans);
+          setTotalMembers(documentSnapshot.data().members);
+        }
+      });
 
     // creating line chart to display
     setInitializing(false);
     fetchChartData(value);
+    setRefreshing(false);
   }
 
   async function fetchChartData(email_id) {
@@ -159,7 +168,12 @@ const HomeScreen = ({ navigation }) => {
     );
   } else {
     return (
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View styles={styles.container}>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Universal GYM</Text>

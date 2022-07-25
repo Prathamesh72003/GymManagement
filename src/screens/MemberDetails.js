@@ -487,7 +487,7 @@ const MemberDetails = ({ route, navigation }) => {
                         <View style={styles.card} key={index}>
                           <View style={styles.AboutPlan}>
                             <Text style={styles.PlanName}>
-                              Service: {service.service} Plan
+                              Service: {service.service}
                             </Text>
                             <Text style={styles.PlanAmount}>
                               Price: {service.amount}
@@ -671,7 +671,7 @@ const styles = StyleSheet.create({
     color: "#2f50c9",
   },
   MemberContact: {
-    fontSize: 12,
+    fontSize: 14,
     opacity: 0.7,
   },
   UpperRightContainer: {
@@ -732,7 +732,7 @@ const styles = StyleSheet.create({
   cards: {},
   card: {
     marginTop: 20,
-    height: 120,
+    // height: 130,
     width: width - 20,
     overflow: "hidden",
     backgroundColor: "#6F84FD",
@@ -752,10 +752,12 @@ const styles = StyleSheet.create({
   PlanName: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 18,
   },
   PlanAmount: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 16,
   },
   PlansInfo: {
     display: "flex",
@@ -766,10 +768,12 @@ const styles = StyleSheet.create({
   PurchaseDate: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 16,
   },
   ExpiryDate: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 16,
   },
   datesAndPayment: {
     display: "flex",
@@ -781,8 +785,11 @@ const styles = StyleSheet.create({
   AddPayment: {
     borderWidth: 1,
     padding: 5,
+    paddingHorizontal: 10,
     borderColor: "white",
-    elevation: 1,
+    borderRadius: 5,
+    backgroundColor: "#6F84FD",
+    elevation: 5,
   },
   AddPaymentText: {
     textAlign: "right",
@@ -794,6 +801,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+    marginBottom: 10,
   },
   PaidAmt: {
     color: "white",
