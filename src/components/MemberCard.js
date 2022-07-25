@@ -10,12 +10,11 @@ import React, { useState } from "react";
 import Entypo from "react-native-vector-icons/Entypo";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import { Menu, Button, Divider, Provider } from "react-native-paper";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 
 const data = [];
 
 const MemberCard = (props) => {
-
   const navigation = useNavigation();
 
   const [visible, setVisible] = useState(true);
@@ -24,7 +23,19 @@ const MemberCard = (props) => {
 
   const closeMenu = () => setVisible(false);
 
-  const { id, email_id, gender, phone_no, joining_date, plans, service, name, injury,address,dob } = props.data;
+  const {
+    id,
+    email_id,
+    gender,
+    phone_no,
+    joining_date,
+    plans,
+    service,
+    name,
+    injury,
+    address,
+    dob,
+  } = props.data;
 
   // const plans_data = JSON.parse(plans);
 
@@ -57,15 +68,20 @@ const MemberCard = (props) => {
   if (plans.length != 0) {
     plans.map((item) => {
       var plan = JSON.parse(item);
-      dueAmount += plan.amount - plan.discount - plan.amountPaid;
+      dueAmount +=
+        parseInt(plan.amount) -
+        parseInt(plan.discount) -
+        parseInt(plan.amountPaid);
     });
   }
 
   if (service.length != 0) {
     service.map((item) => {
       var ser = JSON.parse(item);
-      console.log(ser);
-      dueAmount += ser.amount - ser.discount - ser.amountPaid;
+      dueAmount +=
+        parseInt(ser.amount) -
+        parseInt(ser.discount) -
+        parseInt(ser.amountPaid);
     });
   }
 
@@ -75,7 +91,7 @@ const MemberCard = (props) => {
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => {
-          navigation.navigate("MemberDetails", {data: props.data})
+          navigation.navigate("MemberDetails", { data: props.data });
         }}
       >
         <View style={styles.memberCard}>
