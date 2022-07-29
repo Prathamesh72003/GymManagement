@@ -16,9 +16,13 @@ import DatePicker from "react-native-datepicker";
 import firestore from "@react-native-firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import storage from "@react-native-firebase/storage";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import fs from "react-native-fs";
 
 const AddMember = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
+  const [storeInDB, setStoreInDB] = useState(false);
 
   const [profileImg, setProfileImg] = useState(
     "https://www.kindpng.com/picc/m/173-1731325_person-icon-png-transparent-png.png"
@@ -74,7 +78,7 @@ const AddMember = ({ navigation }) => {
       setPlans(list);
       setSelectedPlan(list[0]);
       setDueAmount(list[0].amount);
-      console.log(list);
+      // console.log(list);
     }
     setInitializing(false);
   };
@@ -102,59 +106,14 @@ const AddMember = ({ navigation }) => {
   };
 
   const addMemberToDB = async () => {
-    const GYM_OWNER_EMAIL_ID = await AsyncStorage.getItem("GYM");
-
     if (name.length != 0 && emailID.length != 0 && phoneNO.length != 0) {
-      var plans_array = [];
-      var plans_array_obj = {
-        durationType: selectedPlan.durationType,
-        duration: selectedPlan.duration,
-        plan: selectedPlan.name,
-        amount: selectedPlan.amount,
-        amountPaid: amountPaid,
-        discount: discount,
-        date: joiningDate,
-      };
-      plans_array.push(JSON.stringify(plans_array_obj));
-
-      var data = {
-        email_id: emailID,
-        gender: gender,
-        id: 1,
-        joining_date: joiningDate,
-        name: name,
-        phone_no: phoneNO,
-        dob: dob,
-        address: address,
-        injury: injury,
-        plans: plans_array,
-        service: [],
-      };
-
-      const increment = firestore.FieldValue.increment(1);
-
-      firestore()
-        .collection("GYM")
-        .doc(GYM_OWNER_EMAIL_ID)
-        .collection("MEMBERS")
-        .add(data)
-        .then((ref) => {
-          ToastAndroid.show("Member added successfully !", ToastAndroid.SHORT);
-          var id = ref._documentPath._parts[3];
-          firestore().collection("GYM").doc(GYM_OWNER_EMAIL_ID).update({
-            members: increment,
-          });
-          firestore()
-            .collection("GYM")
-            .doc(GYM_OWNER_EMAIL_ID)
-            .collection("MEMBERS")
-            .doc(id)
-            .update({
-              id: id,
-            });
-
-          navigation.replace("Members");
-        });
+      setStoreInDB(true);
+      if (
+        profileImg !=
+        "https://www.kindpng.com/picc/m/173-1731325_person-icon-png-transparent-png.png"
+      ) {
+        storeImgInStorage();
+      }
     } else {
       ToastAndroid.show(
         "Name, email id and phone number are required",
@@ -163,52 +122,140 @@ const AddMember = ({ navigation }) => {
     }
   };
 
-  // const storeImgInStorage = async () => {};
+  const storeImgInStorage = async () => {
+    let fileName =
+      profileImg.substring(profileImg.lastIndexOf("/") + 1) + "_" + Date.now();
+    // console.log(profileImg, fileName);
+    var destPath = "";
+    if (profileImg.startsWith("content://")) {
+      const urlComponents = profileImg.split("/");
+      const fileNameAndExtension = urlComponents[urlComponents.length - 1];
+      destPath = `${fs.TemporaryDirectoryPath}/${fileNameAndExtension}`;
+      await fs.copyFile(profileImg, destPath);
+      setProfileImg(destPath);
+      // console.log(destPath);
+      destPath = "file://" + destPath;
+    } else {
+      destPath = profileImg;
+    }
+    // console.log(destPath);
 
-  // const imageOptions = {
-  //   mediaType: "photo",
-  //   includeBase64: false,
-  // };
+    const task = storage()
+      .ref(fileName)
+      .putFile("file://" + destPath);
+    task.on("state_changed", (taskSnapshot) => {
+      // console.log(
+      //   Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
+      //     100
+      // );
+    });
+    task.then(async () => {
+      const firebaseUrl = await storage().ref(fileName).getDownloadURL();
+      // console.log("firebase url: " + firebaseUrl);
 
-  // const takeImgFromFile = async () => {
-  //   const result = await launchImageLibrary(imageOptions);
-  //   console.log(result);
-  //   if (result.didCancel != null) {
-  //     ToastAndroid.show("File not selected", ToastAndroid.SHORT);
-  //   } else if (result.errorMessage != null) {
-  //     ToastAndroid.show("" + result.errorMessage, ToastAndroid.SHORT);
-  //   } else {
-  //     if (result.assets[0].fileSize <= 1000000) {
-  //       setProfileImg(result.assets[0].uri);
-  //     } else {
-  //       ToastAndroid.show(
-  //         "Image size should be less than 1 MB",
-  //         ToastAndroid.LONG
-  //       );
-  //     }
-  //   }
-  // };
-  // const takeImgFromCamera = async () => {
-  //   const result = await launchCamera(imageOptions);
+      addMember(firebaseUrl);
+    });
+  };
 
-  //   if (result.didCancel != null) {
-  //     ToastAndroid.show("File not selected", ToastAndroid.SHORT);
-  //   } else if (result.errorMessage != null) {
-  //     ToastAndroid.show("" + result.errorMessage, ToastAndroid.SHORT);
-  //   } else {
-  //     if (result.assets[0].fileSize <= 1000000) {
-  //       setProfileImg(result.assets[0].uri);
-  //     } else {
-  //       ToastAndroid.show(
-  //         "Image size should be less than 1 MB",
-  //         ToastAndroid.LONG
-  //       );
-  //     }
-  //     // console.log(result.assets[0].uri);
-  //   }
-  // };
+  const addMember = async (firebaseUrl) => {
+    const GYM_OWNER_EMAIL_ID = await AsyncStorage.getItem("GYM");
 
-  if (initializing) {
+    var plans_array = [];
+    var plans_array_obj = {
+      durationType: selectedPlan.durationType,
+      duration: selectedPlan.duration,
+      plan: selectedPlan.name,
+      amount: selectedPlan.amount,
+      amountPaid: amountPaid,
+      discount: discount,
+      date: joiningDate,
+    };
+    plans_array.push(JSON.stringify(plans_array_obj));
+    var data = {
+      email_id: emailID,
+      gender: gender,
+      id: 1,
+      joining_date: joiningDate,
+      name: name,
+      phone_no: phoneNO,
+      dob: dob,
+      address: address,
+      injury: injury,
+      profileImg: firebaseUrl,
+      plans: plans_array,
+      service: [],
+    };
+
+    const increment = firestore.FieldValue.increment(1);
+
+    firestore()
+      .collection("GYM")
+      .doc(GYM_OWNER_EMAIL_ID)
+      .collection("MEMBERS")
+      .add(data)
+      .then((ref) => {
+        var id = ref._documentPath._parts[3];
+        firestore().collection("GYM").doc(GYM_OWNER_EMAIL_ID).update({
+          members: increment,
+        });
+        firestore()
+          .collection("GYM")
+          .doc(GYM_OWNER_EMAIL_ID)
+          .collection("MEMBERS")
+          .doc(id)
+          .update({
+            id: id,
+          });
+        ToastAndroid.show("Member added successfully !", ToastAndroid.SHORT);
+        setStoreInDB(false);
+        navigation.replace("Members");
+      });
+  };
+
+  const imageOptions = {
+    mediaType: "photo",
+    includeBase64: false,
+  };
+
+  const takeImgFromFile = async () => {
+    const result = await launchImageLibrary(imageOptions);
+    console.log(result);
+    if (result.didCancel != null) {
+      ToastAndroid.show("File not selected", ToastAndroid.SHORT);
+    } else if (result.errorMessage != null) {
+      ToastAndroid.show("" + result.errorMessage, ToastAndroid.SHORT);
+    } else {
+      if (result.assets[0].fileSize <= 1000000) {
+        setProfileImg(result.assets[0].uri);
+      } else {
+        ToastAndroid.show(
+          "Image size should be less than 1 MB",
+          ToastAndroid.LONG
+        );
+      }
+    }
+  };
+  const takeImgFromCamera = async () => {
+    const result = await launchCamera(imageOptions);
+
+    if (result.didCancel != null) {
+      ToastAndroid.show("File not selected", ToastAndroid.SHORT);
+    } else if (result.errorMessage != null) {
+      ToastAndroid.show("" + result.errorMessage, ToastAndroid.SHORT);
+    } else {
+      if (result.assets[0].fileSize <= 1000000) {
+        setProfileImg(result.assets[0].uri);
+      } else {
+        ToastAndroid.show(
+          "Image size should be less than 1 MB",
+          ToastAndroid.LONG
+        );
+      }
+      // console.log(result.assets[0].uri);
+    }
+  };
+
+  if (storeInDB) {
     return (
       <View
         style={{
@@ -219,6 +266,7 @@ const AddMember = ({ navigation }) => {
         }}
       >
         <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Adding member please wait.</Text>
       </View>
     );
   }
@@ -226,7 +274,7 @@ const AddMember = ({ navigation }) => {
   return (
     <ScrollView>
       <View style={styles.container}>
-        {/* <View style={styles.imagePickerContainer}>
+        <View style={styles.imagePickerContainer}>
           <View style={styles.imageContainer}>
             <Image
               source={{
@@ -253,7 +301,7 @@ const AddMember = ({ navigation }) => {
               />
             </TouchableOpacity>
           </View>
-        </View> */}
+        </View>
 
         {/* member details block */}
         <View style={styles.block}>
@@ -336,33 +384,48 @@ const AddMember = ({ navigation }) => {
         {/* plan details block */}
         <View style={styles.block}>
           <Text style={styles.blockTitle}>Plan details</Text>
-          <View style={styles.row}>
-            <Dropdown
-              style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={plans}
-              search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={!isFocus ? "Select months" : "..."}
-              searchPlaceholder="Search..."
-              value={selectedPlan.value}
-              onFocus={() => setIsFocus(true)}
-              onBlur={() => setIsFocus(false)}
-              onChange={(item) => {
-                setSelectedPlan(item);
-                setDueAmount(item.amount - discount - amountPaid + "");
-                setIsFocus(false);
+          {initializing == true ? (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                flex: 1,
+                backgroundColor: "#fff",
               }}
-            />
-          </View>
-          <View style={styles.row}>
-            <Text>Plan amount: {selectedPlan.amount}</Text>
-          </View>
+            >
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+          ) : (
+            <View>
+              <View style={styles.row}>
+                <Dropdown
+                  style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  iconStyle={styles.iconStyle}
+                  data={plans}
+                  search
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={!isFocus ? "Select months" : "..."}
+                  searchPlaceholder="Search..."
+                  value={selectedPlan.value}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={(item) => {
+                    setSelectedPlan(item);
+                    setDueAmount(item.amount - discount - amountPaid + "");
+                    setIsFocus(false);
+                  }}
+                />
+              </View>
+              <View style={styles.row}>
+                <Text>Plan amount: {selectedPlan.amount}</Text>
+              </View>
+            </View>
+          )}
         </View>
 
         {/* payment details block */}

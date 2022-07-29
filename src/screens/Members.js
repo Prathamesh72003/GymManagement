@@ -39,7 +39,7 @@ const Members = ({ route, navigation }) => {
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    console.log(route.params);
+    // console.log(route.params);
     if (route.params == null) {
       getMembers();
     } else {
@@ -71,7 +71,8 @@ const Members = ({ route, navigation }) => {
               name,
               injury,
               address,
-              dob
+              dob,
+              profileImg,
             } = doc.data();
             membersList.push({
               id,
@@ -84,7 +85,8 @@ const Members = ({ route, navigation }) => {
               name,
               injury,
               address,
-              dob
+              dob,
+              profileImg,
             });
           });
         });
@@ -131,7 +133,7 @@ const Members = ({ route, navigation }) => {
             </View>
           ) : (
             membersData.map((item) => {
-              console.log(item.name);
+              // console.log(item.name);
               return <MemberCard key={item.id} data={item} />;
             })
           )}

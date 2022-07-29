@@ -274,7 +274,7 @@ const MemberDetails = ({ route, navigation }) => {
                 <View style={styles.MemberImage}>
                   <Image
                     style={styles.avatar}
-                    source={require("../assets/member.png")}
+                    source={{ uri: data.profileImg }}
                   />
                 </View>
                 <View style={styles.MemberInfo}>

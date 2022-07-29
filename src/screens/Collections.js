@@ -5,6 +5,7 @@ import {
   View,
   Dimensions,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 
@@ -30,67 +31,7 @@ const chartConfig = {
   },
 };
 
-const plansSelectedTable = [
-  {
-    id: 10,
-    durationType: "Month",
-    duration: "30 days",
-    amount: 400,
-    amountPaid: 100,
-    discount: 200,
-    date: "",
-  },
-  {
-    id: 11,
-    memID: 1,
-    durationType: "Days",
-    duration: "10",
-    amount: 50,
-    amountPaid: 50,
-    date: "",
-  },
-  {
-    id: 12,
-    memID: 1,
-    durationType: "Days",
-    duration: "10",
-    amount: 50,
-    amountPaid: 0,
-    date: "",
-  },
-];
-
-const servicesSelectedTable = [
-  {
-    id: 10,
-    service: "Cardio",
-    amount: 400,
-    discount: 100,
-    amountPaid: 0,
-    date: "",
-  },
-  {
-    id: 11,
-    memID: 1,
-    name: "Overall",
-    amount: 500,
-    amountPaid: 50,
-    date: "",
-  },
-];
-
-const members = [
-  {
-    id: 1,
-    gender: "male",
-    name: "john",
-    phoneNumber: "808025983",
-    plans: [10, 11, 12],
-    services: [10, 11, 12],
-  },
-];
-
-const Collections = () => {
+const Collections = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
   const [planCollection, setPlanCollection] = useState();
   const [serviceCollection, setServiceCollection] = useState();
@@ -117,29 +58,39 @@ const Collections = () => {
 
     var plan_full = 0;
     var plan_full_total = 0;
+    var plan_full_members = [];
 
     var plan_reminder = 0;
     var plan_reminder_total = 0;
     var plan_reminder_received = 0;
     var plan_reminder_remaining = 0;
+    var plan_reminder_members = [];
 
     var plan_unpaid = 0;
     var plan_unpaid_total = 0;
+    var plan_unpaid_members = [];
 
+    var p = 0;
     membersArray.map((member) => {
       member._data.plans.map((plan_details) => {
         plan_details = JSON.parse(plan_details);
+        p++;
 
         plan_details.amount = parseInt(plan_details.amount);
         plan_details.amountPaid = parseInt(plan_details.amountPaid);
         plan_details.discount = parseInt(plan_details.discount);
 
         discount += plan_details.discount;
-        console.log("plan_details: " + JSON.stringify(plan_details));
+        // console.log("plan_details: " + JSON.stringify(plan_details));
         // checking if plan is completly paid
-        if (plan_details.amount == plan_details.amountPaid) {
+        if (
+          plan_details.amount == plan_details.amountPaid ||
+          plan_details.amount == plan_details.amountPaid + plan_details.discount
+        ) {
           plan_full += 1;
           plan_full_total += plan_details.amount;
+          if (plan_full_members.includes(member._data) == false)
+            plan_full_members.push(member._data);
         } else if (
           plan_details.amountPaid == 0 &&
           plan_details.amount != 0 &&
@@ -147,6 +98,8 @@ const Collections = () => {
         ) {
           plan_unpaid += 1;
           plan_unpaid_total += plan_details.amount;
+          if (plan_unpaid_members.includes(member._data) == false)
+            plan_unpaid_members.push(member._data);
         } else {
           plan_reminder += 1;
           plan_reminder_total += plan_details.amount - plan_details.discount;
@@ -155,11 +108,14 @@ const Collections = () => {
             plan_details.amount -
             plan_details.amountPaid -
             plan_details.discount;
+          if (plan_reminder_members.includes(member._data) == false)
+            plan_reminder_members.push(member._data);
         }
       });
     });
 
     var resultPlan = {
+      totalPlans: p,
       total: plan_full_total + plan_reminder_total + plan_unpaid_total,
       received: plan_full_total + plan_reminder_received,
       remaining: plan_reminder_remaining + plan_unpaid_total,
@@ -171,26 +127,35 @@ const Collections = () => {
       plan_reminder_remaining,
       plan_unpaid,
       plan_unpaid_total,
+      plan_full_members,
+      plan_reminder_members,
+      plan_unpaid_members,
     };
     setPlanCollection(resultPlan);
 
     // calculating services collection
     var service_full = 0;
     var service_full_total = 0;
+    var service_full_members = [];
 
     var service_reminder = 0;
     var service_reminder_total = 0;
     var service_reminder_received = 0;
     var service_reminder_remaining = 0;
+    var service_reminder_members = [];
 
     var service_unpaid = 0;
     var service_unpaid_total = 0;
+    var service_unpaid_members = [];
+
+    var s = 0;
 
     membersArray.map((member) => {
       member._data.service.map((service_details) => {
         // checking if plan is completly paid
         service_details = JSON.parse(service_details);
-        console.log("service_details " + JSON.stringify(service_details));
+        s++;
+        // console.log("service_details " + JSON.stringify(service_details));
 
         service_details.amount = parseInt(service_details.amount);
         service_details.amountPaid = parseInt(service_details.amountPaid);
@@ -201,6 +166,8 @@ const Collections = () => {
         if (service_details.amount == service_details.amountPaid) {
           service_full += 1;
           service_full_total += service_details.amount;
+          if (service_full_members.includes(member._data) == false)
+            service_full_members.push(member._data);
         } else if (
           service_details.amountPaid == 0 &&
           service_details.amount != 0 &&
@@ -209,6 +176,8 @@ const Collections = () => {
           service_unpaid += 1;
           service_unpaid_total +=
             service_details.amount - service_details.discount;
+          if (service_unpaid_members.includes(member._data) == false)
+            service_unpaid_members.push(member._data);
         } else {
           service_reminder += 1;
           service_reminder_total +=
@@ -218,11 +187,14 @@ const Collections = () => {
             service_details.amount -
             service_details.amountPaid -
             service_details.discount;
+          if (service_reminder_members.includes(member._data) == false)
+            service_reminder_members.push(member._data);
         }
       });
     });
 
     var resultService = {
+      totalServices: s,
       total: service_full_total + service_reminder_total + service_unpaid_total,
       received: service_full_total + service_reminder_received,
       remaining: service_reminder_remaining + service_unpaid_total,
@@ -234,6 +206,9 @@ const Collections = () => {
       service_reminder_remaining,
       service_unpaid,
       service_unpaid_total,
+      service_full_members,
+      service_reminder_members,
+      service_unpaid_members,
     };
     setServiceCollection(resultService);
 
@@ -332,10 +307,10 @@ const Collections = () => {
           <View style={styles.block}>
             <Text style={styles.blockTitle}>Members's plan collection</Text>
             <View style={styles.blockDivider} />
-            <View>
+            <TouchableOpacity onPress={() => navigation.navigate("Members")}>
               <View style={styles.row}>
                 <Text style={styles.boldText}>
-                  Total members: {members.length}
+                  Total plans: {planCollection.totalPlans}
                 </Text>
               </View>
               <View style={styles.row}>
@@ -354,9 +329,15 @@ const Collections = () => {
                   {planCollection != null ? planCollection.remaining : null}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
             <View style={styles.blockDivider} />
-            <View>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Members", {
+                  membersData: planCollection.plan_full_members,
+                })
+              }
+            >
               <View style={styles.row}>
                 <Text style={styles.boldText}>
                   Full paid:{" "}
@@ -371,9 +352,15 @@ const Collections = () => {
                     : null}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
             <View style={styles.blockDivider} />
-            <View>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Members", {
+                  membersData: planCollection.plan_reminder_members,
+                })
+              }
+            >
               <View style={styles.row}>
                 <Text style={styles.boldText}>
                   Remainder balance:{" "}
@@ -402,9 +389,15 @@ const Collections = () => {
                     : null}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
             <View style={styles.blockDivider} />
-            <View>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Members", {
+                  membersData: planCollection.plan_unpaid_members,
+                })
+              }
+            >
               <View style={styles.row}>
                 <Text style={styles.boldText}>
                   Unpaid payment:{" "}
@@ -419,17 +412,17 @@ const Collections = () => {
                     : null}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
 
           {/* member service collection */}
           <View style={styles.block}>
             <Text style={styles.blockTitle}>Members's service collection</Text>
             <View style={styles.blockDivider} />
-            <View>
+            <TouchableOpacity onPress={() => navigation.navigate("Members")}>
               <View style={styles.row}>
                 <Text style={styles.boldText}>
-                  Total members: {members.length}
+                  Total services: {serviceCollection.totalServices}
                 </Text>
               </View>
               <View style={styles.row}>
@@ -452,9 +445,15 @@ const Collections = () => {
                     : null}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
             <View style={styles.blockDivider} />
-            <View>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Members", {
+                  membersData: serviceCollection.service_full_members,
+                })
+              }
+            >
               <View style={styles.row}>
                 <Text style={styles.boldText}>
                   Full paid:{" "}
@@ -471,9 +470,15 @@ const Collections = () => {
                     : null}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
             <View style={styles.blockDivider} />
-            <View>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Members", {
+                  membersData: serviceCollection.service_reminder_members,
+                })
+              }
+            >
               <View style={styles.row}>
                 <Text style={styles.boldText}>
                   Remainder balance:{" "}
@@ -504,9 +509,15 @@ const Collections = () => {
                     : null}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
             <View style={styles.blockDivider} />
-            <View>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Members", {
+                  membersData: serviceCollection.service_unpaid_members,
+                })
+              }
+            >
               <View style={styles.row}>
                 <Text style={styles.boldText}>
                   Unpaid payment:{" "}
@@ -523,7 +534,7 @@ const Collections = () => {
                     : null}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
           <View style={{ marginBottom: 80 }}></View>
         </View>

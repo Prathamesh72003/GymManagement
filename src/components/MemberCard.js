@@ -3,6 +3,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Image,
   TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
@@ -85,6 +86,8 @@ const MemberCard = (props) => {
     });
   }
 
+  // console.log(props.data.profileImg);
+
   return (
     <View>
       {/* <Provider style={{padding: 0, margin: 0}}> */}
@@ -97,7 +100,11 @@ const MemberCard = (props) => {
         <View style={styles.memberCard}>
           <View style={styles.memberCardLeft}>
             <View style={styles.memberAvatar}>
-              <Fontisto name={props.data.gender} size={25} color="#2f50c9" />
+              <Image
+                source={{ uri: props.data.profileImg }}
+                style={styles.profileImg}
+              />
+              {/* <Fontisto name={props.data.gender} size={25} color="#2f70c9" /> */}
             </View>
           </View>
           <View style={styles.memberCardRight}>
@@ -190,8 +197,8 @@ const styles = StyleSheet.create({
   memberCard: {
     display: "flex",
     flexDirection: "row",
-    padding: 20,
-    marginVertical: 15,
+    padding: 15,
+    marginVertical: 10,
     backgroundColor: "#fff",
     borderRadius: 15,
     elevation: 5,
@@ -206,9 +213,14 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    height: 50,
-    width: 50,
-    borderRadius: 50,
+    height: 70,
+    width: 70,
+    borderRadius: 70,
+  },
+  profileImg: {
+    height: 70,
+    width: 70,
+    borderRadius: 70,
   },
   memberText: {
     fontSize: 17,
