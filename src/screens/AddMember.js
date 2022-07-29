@@ -318,6 +318,7 @@ const AddMember = ({ navigation }) => {
             <View style={styles.row}>
               <TextInput
                 label="Enter phone number"
+                maxLength={10}
                 style={styles.input}
                 keyboardType="numeric"
                 value={phoneNO}
