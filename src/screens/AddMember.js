@@ -75,6 +75,13 @@ const AddMember = ({ navigation }) => {
         list.push(obj);
         i++;
       });
+      if (list.length == 0) {
+        ToastAndroid.show(
+          "There are no plans please add one",
+          ToastAndroid.SHORT
+        );
+        navigation.replace("AddPlan");
+      }
       setPlans(list);
       setSelectedPlan(list[0]);
       setDueAmount(list[0].amount);
@@ -320,6 +327,7 @@ const AddMember = ({ navigation }) => {
                 label="Enter phone number"
                 style={styles.input}
                 keyboardType="numeric"
+                maxLength={10}
                 value={phoneNO}
                 onChangeText={(text) => setPhoneNO(text)}
               />

@@ -5,6 +5,7 @@ import {
   View,
   ActivityIndicator,
   TouchableOpacity,
+  TextInput,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
@@ -35,15 +36,17 @@ const data = [
 ];
 
 const Members = ({ route, navigation }) => {
-  const [membersData, setMembersData] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [search, setSearch] = useState("");
   const [initializing, setInitializing] = useState(true);
-
+  const [text, setText] = useState("");
   useEffect(() => {
-    // console.log(route.params);
     if (route.params == null) {
       getMembers();
     } else {
-      setMembersData(route.params.membersData);
+      setAllUsers(route.params.membersData);
+      setFilteredUsers(route.params.membersData);
       setInitializing(false);
     }
   }, []);
@@ -90,10 +93,26 @@ const Members = ({ route, navigation }) => {
             });
           });
         });
-      setMembersData(membersList);
+      setAllUsers(membersList);
+      setFilteredUsers(membersList);
       setInitializing(false);
     } catch (error) {
       console.log("eee" + error);
+    }
+  };
+
+  const searchUser = (text) => {
+    if (text) {
+      const newData = allUsers.filter(function (item) {
+        const itemData = item.name ? item.name.toUpperCase() : "".toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilteredUsers(newData);
+      setSearch(text);
+    } else {
+      setFilteredUsers(allUsers);
+      setSearch(text);
     }
   };
 
@@ -112,41 +131,53 @@ const Members = ({ route, navigation }) => {
     );
   }
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1 }}
-      styles={styles.container}
-    >
-      <Provider>
-        <View style={styles.body}>
-          {membersData.length == 0 ? (
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                flex: 1,
-                backgroundColor: "#fff",
-              }}
-            >
-              <Text style={{ fontSize: 20, fontWeight: "700" }}>
-                No members found
-              </Text>
+    <>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        styles={styles.container}
+      >
+        <Provider>
+          <View style={styles.body}>
+            <View style={styles.SearchConatiner}>
+              <TextInput
+                style={styles.textInputStyle}
+                onChangeText={(text) => searchUser(text)}
+                value={search}
+                placeholderTextColor="#000"
+                underlineColorAndroid="transparent"
+                placeholder="Search User"
+              />
             </View>
-          ) : (
-            membersData.map((item) => {
-              // console.log(item.name);
-              return <MemberCard key={item.id} data={item} />;
-            })
-          )}
 
-          <FAB
-            color={"#fff"}
-            icon="plus"
-            style={styles.fab}
-            onPress={() => navigation.navigate("AddMember")}
-          />
-        </View>
-      </Provider>
-    </ScrollView>
+            {filteredUsers.length == 0 ? (
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flex: 1,
+                  backgroundColor: "#fff",
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "700" }}>
+                  No members found
+                </Text>
+              </View>
+            ) : (
+              filteredUsers.map((item) => {
+                // console.log(item.name);
+                return <MemberCard key={item.id} data={item} />;
+              })
+            )}
+          </View>
+        </Provider>
+      </ScrollView>
+      <FAB
+        color={"#fff"}
+        icon="plus"
+        style={styles.fab}
+        onPress={() => navigation.navigate("AddMember")}
+      />
+    </>
   );
 };
 
@@ -160,6 +191,19 @@ const styles = StyleSheet.create({
     height: "100%",
     padding: 20,
     backgroundColor: "#fff",
+  },
+  SearchConatiner: {
+    marginBottom: 10,
+  },
+  textInputStyle: {
+    height: 40,
+    borderWidth: 1,
+    paddingLeft: 20,
+    margin: 5,
+    borderColor: "#000",
+    color: "#000",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
   },
   fab: {
     position: "absolute",

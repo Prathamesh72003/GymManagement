@@ -79,7 +79,7 @@ const QuickAction = () => {
         } else {
           var d = new Date();
           d = d.setDate(d.getDate() + 10);
-          console.log(res, new Date(d));
+          // console.log(res, new Date(d));
           if (res < d) {
             near_term_expriy_member.push(member);
           }
@@ -93,7 +93,6 @@ const QuickAction = () => {
     setActiveMemberList(active_member);
     setExpiredMemberList(expired_member);
     setBlockMemberList(block_member);
-
     setInitializing(false);
   };
 

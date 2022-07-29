@@ -23,6 +23,7 @@ const ProfileScreen = ({ navigation }) => {
   const [totalServices, setTotalServices] = useState("");
   const [totalPlans, setTotalPlans] = useState("");
   const [totalMembers, setTotalMembers] = useState();
+  const [expiryDate, setExpiryDate] = useState();
 
   useEffect(() => {
     fetchData();
@@ -46,6 +47,19 @@ const ProfileScreen = ({ navigation }) => {
           setTotalServices(documentSnapshot.data().services);
           setTotalPlans(documentSnapshot.data().plans);
           setTotalMembers(documentSnapshot.data().members);
+          var expiry_date = documentSnapshot.data().expiry_date;
+
+          var date = new Date(Date.UTC(1970, 0, 1)); // Epoch
+          date.setUTCSeconds(expiry_date.seconds);
+
+          date =
+            date.getDate() +
+            "/" +
+            (date.getMonth() + 1) +
+            "/" +
+            date.getFullYear();
+
+          setExpiryDate(date);
         }
       });
   }
@@ -72,6 +86,7 @@ const ProfileScreen = ({ navigation }) => {
               <View style={styles.TileSubtitle}>
                 <Text style={styles.GymName}>{gymname + " Fitness"}</Text>
                 <Text style={styles.OwnerName}>{ownername}</Text>
+                <Text style={{ fontSize: 17 }}>Plan expiry: {expiryDate}</Text>
               </View>
             </View>
             <View style={styles.contactInfo}>
