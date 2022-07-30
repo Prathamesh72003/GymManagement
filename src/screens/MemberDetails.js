@@ -8,7 +8,7 @@ import {
   Dimensions,
   ActivityIndicator,
   ToastAndroid,
-  Linking
+  Linking,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
@@ -52,7 +52,6 @@ const MemberDetails = ({ route, navigation }) => {
   const [amount, setAmount] = useState("");
   const [dueAmount, setDueAmount] = useState("");
 
-  
   const { data } = route.params;
 
   var date = new Date(Date.UTC(1970, 0, 1)); // Epoch
@@ -268,12 +267,17 @@ const MemberDetails = ({ route, navigation }) => {
   }
 
   const whatsappFun = (phone_no, name) => {
-    Linking.openURL('whatsapp://send?text=Hello '+name+', this message is to to inform you about&phone='+phone_no);
-  }
-  
+    Linking.openURL(
+      "whatsapp://send?text=Hello " +
+        name +
+        ", this message is to to inform you about&phone=" +
+        phone_no
+    );
+  };
+
   const phoneFun = (phone_no) => {
-    Linking.openURL(`tel:${phone_no}`)
-  }
+    Linking.openURL(`tel:${phone_no}`);
+  };
 
   return (
     <View style={{ backgroundColor: "#2f50c9", height: "100%" }}>
@@ -321,7 +325,11 @@ const MemberDetails = ({ route, navigation }) => {
                   <Text style={styles.Discription}>{dob}</Text>
                 </View>
                 <View style={styles.QuickAction}>
-                  <TouchableOpacity onPress={()=> {whatsappFun(data.phone_no, data.name)}}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      whatsappFun(data.phone_no, data.name);
+                    }}
+                  >
                     <View style={styles.quicktab}>
                       <FontAwesome5
                         name="whatsapp"
@@ -333,7 +341,11 @@ const MemberDetails = ({ route, navigation }) => {
                       </Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={()=> {phoneFun(data.phone_no)}}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      phoneFun(data.phone_no);
+                    }}
+                  >
                     <View style={styles.quicktab}>
                       <FontAwesome5 name="phone" size={22} color={"#2f50c9"} />
                       <Text style={{ fontSize: 10, fontWeight: "bold" }}>
@@ -349,23 +361,22 @@ const MemberDetails = ({ route, navigation }) => {
                       </Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => banfun()}
-                  >
-                    {data.block == true ? 
-                    <View style={styles.quicktab}>
-                    <FontAwesome5 name="ban" size={22} color={"red"} />
-                    <Text style={{ fontSize: 10, fontWeight: "bold" }}>
-                      Banned
-                    </Text>
-                  </View>: (
-                    <View style={styles.quicktab}>
-                    <FontAwesome5 name="ban" size={22} color={"#2f50c9"} />
-                    <Text style={{ fontSize: 10, fontWeight: "bold" }}>
-                      Ban
-                    </Text>
-                  </View>
-                  )}
+                  <TouchableOpacity onPress={() => banfun()}>
+                    {data.block == true ? (
+                      <View style={styles.quicktab}>
+                        <FontAwesome5 name="ban" size={22} color={"red"} />
+                        <Text style={{ fontSize: 10, fontWeight: "bold" }}>
+                          Banned
+                        </Text>
+                      </View>
+                    ) : (
+                      <View style={styles.quicktab}>
+                        <FontAwesome5 name="ban" size={22} color={"#2f50c9"} />
+                        <Text style={{ fontSize: 10, fontWeight: "bold" }}>
+                          Ban
+                        </Text>
+                      </View>
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>

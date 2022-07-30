@@ -36,7 +36,7 @@ const MemberCard = (props) => {
     injury,
     address,
     dob,
-    block
+    block,
   } = props.data;
 
   // const plans_data = JSON.parse(plans);

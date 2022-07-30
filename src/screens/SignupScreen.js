@@ -36,6 +36,9 @@ const SignupScreen = ({ navigation }) => {
         ToastAndroid.CENTER
       );
     } else {
+      var today = new Date();
+      var expiry_date = new Date();
+      expiry_date.setDate(today.getDate() + 30);
       await auth()
         .createUserWithEmailAndPassword(email, password)
         .then(() => {
@@ -49,7 +52,8 @@ const SignupScreen = ({ navigation }) => {
               owner: owner,
               phone: phone,
               password: password,
-              date: new Date(),
+              date: today,
+              expiry_date: expiry_date,
               plans: "0",
               services: "0",
               members: "0",
