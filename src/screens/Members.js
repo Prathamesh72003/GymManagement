@@ -36,7 +36,7 @@ const data = [
 ];
 
 const Members = ({ route, navigation }) => {
-  const [allUsers, setAllUsers] = useState([]);
+  const [membersData, setMembersData] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [initializing, setInitializing] = useState(true);
@@ -46,7 +46,7 @@ const Members = ({ route, navigation }) => {
     if (route.params == null) {
       getMembers();
     } else {
-      setAllUsers(route.params.membersData);
+      setMembersData(route.params.membersData);
       setInitializing(false);
     }
   }, []);
@@ -76,6 +76,7 @@ const Members = ({ route, navigation }) => {
               address,
               dob,
               profileImg,
+              block
             } = doc.data();
             membersList.push({
               id,
@@ -90,10 +91,11 @@ const Members = ({ route, navigation }) => {
               address,
               dob,
               profileImg,
+              block
             });
           });
         });
-      setAllUsers(membersList);
+      setMembersData(membersList);
       setFilteredUsers(membersList);
       setInitializing(false);
     } catch (error) {
@@ -103,7 +105,7 @@ const Members = ({ route, navigation }) => {
 
   const searchUser = (text) => {
     if (text) {
-      const newData = allUsers.filter(function (item) {
+      const newData = membersData.filter(function (item) {
         const itemData = item.name ? item.name.toUpperCase() : "".toUpperCase();
         const textData = text.toUpperCase();
         return itemData.indexOf(textData) > -1;
@@ -111,7 +113,7 @@ const Members = ({ route, navigation }) => {
       setFilteredUsers(newData);
       setSearch(text);
     } else {
-      setFilteredUsers(allUsers);
+      setFilteredUsers(membersData);
       setSearch(text);
     }
   };

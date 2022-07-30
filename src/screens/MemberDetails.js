@@ -8,6 +8,7 @@ import {
   Dimensions,
   ActivityIndicator,
   ToastAndroid,
+  Linking
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
@@ -51,6 +52,7 @@ const MemberDetails = ({ route, navigation }) => {
   const [amount, setAmount] = useState("");
   const [dueAmount, setDueAmount] = useState("");
 
+  
   const { data } = route.params;
 
   var date = new Date(Date.UTC(1970, 0, 1)); // Epoch
@@ -100,6 +102,7 @@ const MemberDetails = ({ route, navigation }) => {
         })
         .then(() => {
           console.log("Blocked");
+          ToastAndroid.show("Member Banned successfully!", ToastAndroid.SHORT);
         });
     } catch (error) {
       console.log(error);
@@ -264,6 +267,14 @@ const MemberDetails = ({ route, navigation }) => {
     );
   }
 
+  const whatsappFun = (phone_no, name) => {
+    Linking.openURL('whatsapp://send?text=Hello '+name+', this message is to to inform you about&phone='+phone_no);
+  }
+  
+  const phoneFun = (phone_no) => {
+    Linking.openURL(`tel:${phone_no}`)
+  }
+
   return (
     <View style={{ backgroundColor: "#2f50c9", height: "100%" }}>
       <Provider>
@@ -310,19 +321,19 @@ const MemberDetails = ({ route, navigation }) => {
                   <Text style={styles.Discription}>{dob}</Text>
                 </View>
                 <View style={styles.QuickAction}>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={()=> {whatsappFun(data.phone_no, data.name)}}>
                     <View style={styles.quicktab}>
                       <FontAwesome5
-                        name="envelope"
+                        name="whatsapp"
                         size={22}
                         color={"#2f50c9"}
                       />
                       <Text style={{ fontSize: 10, fontWeight: "bold" }}>
-                        Message
+                        Whatsapp
                       </Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={()=> {phoneFun(data.phone_no)}}>
                     <View style={styles.quicktab}>
                       <FontAwesome5 name="phone" size={22} color={"#2f50c9"} />
                       <Text style={{ fontSize: 10, fontWeight: "bold" }}>
@@ -339,15 +350,22 @@ const MemberDetails = ({ route, navigation }) => {
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    activeOpacity={0.9}
                     onPress={() => banfun()}
                   >
+                    {data.block == true ? 
                     <View style={styles.quicktab}>
-                      <FontAwesome5 name="ban" size={22} color={"#2f50c9"} />
-                      <Text style={{ fontSize: 10, fontWeight: "bold" }}>
-                        Ban
-                      </Text>
-                    </View>
+                    <FontAwesome5 name="ban" size={22} color={"red"} />
+                    <Text style={{ fontSize: 10, fontWeight: "bold" }}>
+                      Banned
+                    </Text>
+                  </View>: (
+                    <View style={styles.quicktab}>
+                    <FontAwesome5 name="ban" size={22} color={"#2f50c9"} />
+                    <Text style={{ fontSize: 10, fontWeight: "bold" }}>
+                      Ban
+                    </Text>
+                  </View>
+                  )}
                   </TouchableOpacity>
                 </View>
               </View>
@@ -652,7 +670,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   ImageName: {
-    width: 130,
     overflow: "hidden",
   },
   MemberImage: {},
@@ -664,6 +681,7 @@ const styles = StyleSheet.create({
   },
   MemberInfo: {
     marginTop: 10,
+    width: 130,
   },
   MemberName: {
     fontSize: 20,
