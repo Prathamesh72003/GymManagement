@@ -232,11 +232,11 @@ const AddMember = ({ navigation }) => {
     } else if (result.errorMessage != null) {
       ToastAndroid.show("" + result.errorMessage, ToastAndroid.SHORT);
     } else {
-      if (result.assets[0].fileSize <= 1000000) {
+      if (result.assets[0].fileSize <= 2000000) {
         setProfileImg(result.assets[0].uri);
       } else {
         ToastAndroid.show(
-          "Image size should be less than 1 MB",
+          "Image size should be less than 2 MB",
           ToastAndroid.LONG
         );
       }
