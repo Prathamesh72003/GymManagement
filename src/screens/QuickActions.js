@@ -6,6 +6,7 @@ import {
   View,
   ScrollView,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 
@@ -16,6 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const QuickAction = () => {
   const [initializing, setInitializing] = useState(true);
+
   const [nearTermExpriy, setNearTermExpriy] = useState([]);
   const [totalMemberList, setTotalMemberList] = useState([]);
   const [activeMemberList, setActiveMemberList] = useState([]);
@@ -46,6 +48,10 @@ const QuickAction = () => {
             plans,
             service,
             name,
+            injury,
+            address,
+            dob,
+            profileImg,
           } = doc.data();
           membersList.push({
             id,
@@ -56,6 +62,10 @@ const QuickAction = () => {
             plans,
             service,
             name,
+            injury,
+            address,
+            dob,
+            profileImg,
           });
         });
       });
@@ -95,6 +105,11 @@ const QuickAction = () => {
     setBlockMemberList(block_member);
     setInitializing(false);
   };
+
+  const onRefresh = React.useCallback(() => {
+    setInitializing(true);
+    fetchData();
+  }, []);
 
   const find_if_expired = (plans) => {
     var plan_expiry = "";
@@ -139,9 +154,15 @@ const QuickAction = () => {
 
   return (
     <View styles={styles.container}>
-      <ScrollView>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={
+          <RefreshControl refreshing={initializing} onRefresh={onRefresh} />
+        }
+      >
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Quick Actions</Text>
+          <Text style={{ color: "#ddd" }}>Pull to load changes</Text>
         </View>
         <View style={styles.body}>
           <View style={styles.row}>

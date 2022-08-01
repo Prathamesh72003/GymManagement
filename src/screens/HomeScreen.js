@@ -177,6 +177,7 @@ const HomeScreen = ({ navigation }) => {
         <View styles={styles.container}>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Universal GYM</Text>
+            <Text style={{ color: "#ddd" }}>Pull to load changes</Text>
           </View>
           <View style={styles.body}>
             <View style={styles.row}>

@@ -4,6 +4,8 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
@@ -15,15 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileScreen = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState("");
-  const [gymname, setGymname] = useState("");
-  const [ownername, setOwnername] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [totalServices, setTotalServices] = useState("");
-  const [totalPlans, setTotalPlans] = useState("");
-  const [totalMembers, setTotalMembers] = useState();
-  const [expiryDate, setExpiryDate] = useState();
+  const [profileData, setProfileData] = useState();
 
   useEffect(() => {
     fetchData();
@@ -31,7 +25,6 @@ const ProfileScreen = ({ navigation }) => {
 
   async function fetchData() {
     const value = await AsyncStorage.getItem("GYM");
-    console.log("function called");
 
     firestore()
       .collection("GYM")
@@ -40,13 +33,6 @@ const ProfileScreen = ({ navigation }) => {
       .then((documentSnapshot) => {
         if (documentSnapshot.exists) {
           // console.log('User data: ', documentSnapshot.data());
-          setGymname(documentSnapshot.data().gymname);
-          setOwnername(documentSnapshot.data().owner);
-          setPhone(documentSnapshot.data().phone);
-          setEmail(documentSnapshot.data().email);
-          setTotalServices(documentSnapshot.data().services);
-          setTotalPlans(documentSnapshot.data().plans);
-          setTotalMembers(documentSnapshot.data().members);
           var expiry_date = documentSnapshot.data().expiry_date;
 
           var date = new Date(Date.UTC(1970, 0, 1)); // Epoch
@@ -58,22 +44,58 @@ const ProfileScreen = ({ navigation }) => {
             (date.getMonth() + 1) +
             "/" +
             date.getFullYear();
-
-          setExpiryDate(date);
+          setProfileData({
+            gymname: documentSnapshot.data().gymname,
+            ownername: documentSnapshot.data().owner,
+            phone: documentSnapshot.data().phone,
+            email: documentSnapshot.data().email,
+            totalServices: documentSnapshot.data().services,
+            totalPlans: documentSnapshot.data().plans,
+            totalMembers: documentSnapshot.data().members,
+            expiryDate: date,
+            planType: documentSnapshot.data().plan_type,
+          });
         }
+        setInitializing(false);
       });
   }
+
+  const onRefresh = React.useCallback(() => {
+    setInitializing(true);
+    fetchData();
+  }, []);
 
   const logout = async () => {
     await AsyncStorage.removeItem("GYM");
     navigation.replace("Login");
   };
 
+  if (initializing) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
-    <ScrollView>
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      refreshControl={
+        <RefreshControl refreshing={initializing} onRefresh={onRefresh} />
+      }
+    >
       <View styles={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Profile</Text>
+          <Text style={{ color: "#ddd" }}>Pull to load changes</Text>
         </View>
         <View style={styles.body}>
           <View style={styles.upperConatiner}>
@@ -84,9 +106,14 @@ const ProfileScreen = ({ navigation }) => {
                 source={require("../assets/user.png")}
               />
               <View style={styles.TileSubtitle}>
-                <Text style={styles.GymName}>{gymname + " Fitness"}</Text>
-                <Text style={styles.OwnerName}>{ownername}</Text>
-                <Text style={{ fontSize: 17 }}>Plan expiry: {expiryDate}</Text>
+                <Text style={styles.GymName}>{profileData.gymname}</Text>
+                <Text style={styles.OwnerName}>{profileData.ownername}</Text>
+                <Text style={{ fontSize: 17 }}>
+                  Plan type: {profileData.planType}
+                </Text>
+                <Text style={{ fontSize: 17 }}>
+                  Plan expiry: {profileData.expiryDate}
+                </Text>
               </View>
             </View>
             <View style={styles.contactInfo}>
@@ -97,7 +124,7 @@ const ProfileScreen = ({ navigation }) => {
                   size={20}
                   color={"#000"}
                 />
-                <Text style={styles.phoneNumber}>{phone}</Text>
+                <Text style={styles.phoneNumber}>{profileData.phone}</Text>
               </View>
               <View style={styles.contactCard}>
                 <FontAwesome5
@@ -106,7 +133,7 @@ const ProfileScreen = ({ navigation }) => {
                   size={20}
                   color={"#000"}
                 />
-                <Text style={styles.emailId}>{email}</Text>
+                <Text style={styles.emailId}>{profileData.email}</Text>
               </View>
             </View>
           </View>
@@ -122,7 +149,7 @@ const ProfileScreen = ({ navigation }) => {
                       color: "#2f50c9",
                     }}
                   >
-                    {totalMembers}
+                    {profileData.totalMembers}
                   </Text>
                   <Text style={styles.componentText}>Members</Text>
                 </View>
@@ -137,7 +164,7 @@ const ProfileScreen = ({ navigation }) => {
                       color: "#2f50c9",
                     }}
                   >
-                    {totalPlans}
+                    {profileData.totalPlans}
                   </Text>
                   <Text style={styles.componentText}>Plans</Text>
                 </View>
@@ -152,7 +179,7 @@ const ProfileScreen = ({ navigation }) => {
                       color: "#2f50c9",
                     }}
                   >
-                    {totalServices}
+                    {profileData.totalServices}
                   </Text>
                   <Text style={styles.componentText}>Services</Text>
                 </View>

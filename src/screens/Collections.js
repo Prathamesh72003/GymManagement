@@ -6,6 +6,7 @@ import {
   Dimensions,
   ActivityIndicator,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 
@@ -262,6 +263,11 @@ const Collections = ({ navigation }) => {
     setInitializing(false);
   };
 
+  const onRefresh = React.useCallback(() => {
+    setInitializing(true);
+    fetchData();
+  }, []);
+
   if (initializing) {
     return (
       <View
@@ -278,11 +284,17 @@ const Collections = ({ navigation }) => {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      refreshControl={
+        <RefreshControl refreshing={initializing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.container}>
         {/* date block */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Collection</Text>
+          <Text style={{ color: "#ddd" }}>Pull to load changes</Text>
         </View>
         <View style={styles.body}>
           <View style={styles.block}>
