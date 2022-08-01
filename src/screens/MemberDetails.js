@@ -390,32 +390,42 @@ const MemberDetails = ({ route, navigation }) => {
                   <TouchableOpacity
                     activeOpacity={0.9}
                     onPress={() => setChoice("1")}
-                    style={{
-                      backgroundColor: choice == "1" ? "#6F84FD" : "#fff",
-                      borderRadius: 20,
-                      width: 150,
-                    }}
+                    style={[
+                      styles.tab,
+                      {
+                        backgroundColor: choice == "1" ? "#6F84FD" : "#fff",
+                      },
+                    ]}
                   >
                     <Text
                       style={{
                         color: choice == "1" ? "#fff" : "#000",
                         fontSize: 18,
                         textAlign: "center",
-                        padding: 5,
                         fontWeight: choice == "1" ? "bold" : "100",
                       }}
                     >
                       Plans
                     </Text>
+                    <View style={styles.circle}>
+                      <Text
+                        style={{
+                          color: "#fff",
+                        }}
+                      >
+                        {data.plans.length}
+                      </Text>
+                    </View>
                   </TouchableOpacity>
                   <TouchableOpacity
                     activeOpacity={0.9}
                     onPress={() => setChoice("2")}
-                    style={{
-                      backgroundColor: choice == "2" ? "#6F84FD" : "#fff",
-                      borderRadius: 20,
-                      width: 150,
-                    }}
+                    style={[
+                      styles.tab,
+                      {
+                        backgroundColor: choice == "2" ? "#6F84FD" : "#fff",
+                      },
+                    ]}
                   >
                     <Text
                       style={{
@@ -428,6 +438,15 @@ const MemberDetails = ({ route, navigation }) => {
                     >
                       Services
                     </Text>
+                    <View style={styles.circle}>
+                      <Text
+                        style={{
+                          color: "#fff",
+                        }}
+                      >
+                        {data.service.length}
+                      </Text>
+                    </View>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -752,6 +771,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  tab: {
+    borderRadius: 20,
+    width: 150,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+  },
   Holder: {
     backgroundColor: "#2f50c9",
     width: width,
@@ -865,5 +892,15 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 20,
     fontWeight: "bold",
+  },
+  circle: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 20,
+    height: 20,
+    borderRadius: 20,
+    backgroundColor: "#000",
+    marginLeft: 5,
   },
 });
