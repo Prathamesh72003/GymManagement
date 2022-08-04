@@ -48,17 +48,27 @@ const LoginScreen = ({ navigation }) => {
               ToastAndroid.SHORT,
               ToastAndroid.CENTER
             );
-          }
-          if (error.code === "auth/wrong-password") {
+          } else if (error.code === "auth/wrong-password") {
             // console.log('The password does not matches the email id!');
             ToastAndroid.show(
               "Invalid password!",
               ToastAndroid.SHORT,
               ToastAndroid.CENTER
             );
+          } else if (error.code === "auth/user-not-found") {
+            // console.log('The password does not matches the email id!');
+            ToastAndroid.show(
+              "There is no such user.",
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER
+            );
+          } else {
+            ToastAndroid.show(
+              "" + error.message,
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER
+            );
           }
-
-          console.log(error);
         });
     }
   };
