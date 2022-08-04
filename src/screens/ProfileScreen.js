@@ -6,6 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  Share,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
@@ -84,6 +85,25 @@ const ProfileScreen = ({ navigation }) => {
       </View>
     );
   }
+
+  const share = async () => {
+    try {
+      const result = await Share.share({
+        title: "App link",
+        message:
+          "Hey there checkout this amazing management app I found! , AppLink : https://google.com",
+        url: "https://google.com",
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+        } else {
+        }
+      } else if (result.action === Share.dismissedAction) {
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   return (
     <ScrollView
@@ -199,7 +219,11 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  share();
+                }}
+              >
                 <View style={styles.listItem}>
                   <View style={styles.Icon}>
                     <FontAwesome5 name="bullhorn" size={22} color={"#2f50c9"} />

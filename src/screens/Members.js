@@ -13,7 +13,7 @@ import { FAB, Provider } from "react-native-paper";
 import MemberCard from "./../components/MemberCard";
 import firestore from "@react-native-firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 const data = [
   {
     id: 1,
@@ -139,6 +139,7 @@ const Members = ({ route, navigation }) => {
         <Provider>
           <View style={styles.body}>
             <View style={styles.SearchConatiner}>
+            <FontAwesome5 name="search" size={18} color={"#000"} />
               <TextInput
                 style={styles.textInputStyle}
                 onChangeText={(text) => searchUser(text)}
@@ -193,17 +194,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   SearchConatiner: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
-  },
-  textInputStyle: {
-    height: 40,
-    borderWidth: 1,
-    paddingLeft: 20,
-    margin: 5,
     borderColor: "#000",
     color: "#000",
     backgroundColor: "#FFFFFF",
     borderRadius: 20,
+    borderWidth: 1,
+    padding: 10,
+    height: 45,
+  },
+  textInputStyle: {
+    flex: 1,
+    height: 45,
+    paddingLeft: 10,
+    margin: 5,
+    color: '#000'
   },
   fab: {
     position: "absolute",

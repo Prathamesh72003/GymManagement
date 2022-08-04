@@ -8,6 +8,7 @@ import {
   ScrollView,
   Dimensions,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import {
@@ -31,6 +32,8 @@ const Subscription = () => {
   const [price, setPrice] = useState("0");
   const [subs, setSubs] = useState([]);
   const [initializing, setInitializing] = useState(true);
+  const [url, setUrl] = useState("");
+
 
   const [visible, setVisible] = React.useState(false);
   const showModal = () => setVisible(true);
@@ -64,6 +67,7 @@ const Subscription = () => {
         });
       setPlan(subsList[0]);
       setPrice(subsList[0].discounted_price);
+      setUrl(subsList[0].payment_link);
       setSubs(subsList);
       setInitializing(false);
     };
@@ -80,6 +84,7 @@ const Subscription = () => {
         "Proccessing a payment for " + plan.name + "plan",
         ToastAndroid.SHORT
       );
+      Linking.openURL(url)
     }
   };
 
@@ -119,7 +124,7 @@ const Subscription = () => {
                     key={index}
                     activeOpacity={0.9}
                     onPress={() => {
-                      setPlan(item), setPrice(item.discounted_price);
+                      setPlan(item), setPrice(item.discounted_price), setUrl(item.payment_link);
                     }}
                     style={[
                       styles.Card,
@@ -130,7 +135,7 @@ const Subscription = () => {
                       },
                     ]}
                   >
-                    <Card>
+                    <Card style={{backgroundColor: "#fff"}}>
                       <View style={styles.cardHeader}>
                         <View style={styles.cardHeaderPriceSection}>
                           <Text style={styles.discountedPrice}>
