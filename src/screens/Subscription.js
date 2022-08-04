@@ -32,8 +32,6 @@ const Subscription = () => {
   const [price, setPrice] = useState("0");
   const [subs, setSubs] = useState([]);
   const [initializing, setInitializing] = useState(true);
-  const [url, setUrl] = useState("");
-
 
   const [visible, setVisible] = React.useState(false);
   const showModal = () => setVisible(true);
@@ -67,7 +65,6 @@ const Subscription = () => {
         });
       setPlan(subsList[0]);
       setPrice(subsList[0].discounted_price);
-      setUrl(subsList[0].payment_link);
       setSubs(subsList);
       setInitializing(false);
     };
@@ -84,7 +81,6 @@ const Subscription = () => {
         "Proccessing a payment for " + plan.name + "plan",
         ToastAndroid.SHORT
       );
-      Linking.openURL(url)
     }
   };
 
@@ -124,7 +120,8 @@ const Subscription = () => {
                     key={index}
                     activeOpacity={0.9}
                     onPress={() => {
-                      setPlan(item), setPrice(item.discounted_price), setUrl(item.payment_link);
+                      setPlan(item);
+                      setPrice(item.discounted_price);
                     }}
                     style={[
                       styles.Card,
@@ -135,7 +132,7 @@ const Subscription = () => {
                       },
                     ]}
                   >
-                    <Card style={{backgroundColor: "#fff"}}>
+                    <Card style={{ backgroundColor: "#fff" }}>
                       <View style={styles.cardHeader}>
                         <View style={styles.cardHeaderPriceSection}>
                           <Text style={styles.discountedPrice}>
@@ -195,7 +192,12 @@ const Subscription = () => {
               <View style={{ marginBottom: 10 }} />
               <Text style={styles.text}>Follow the below steps</Text>
               <Text style={styles.text}>
-                {"\u2022"} Pay the amount using this link : {plan.payment_link}
+                {"\u2022"} Pay the amount using this link :{" "}
+                <TouchableOpacity
+                  onPress={() => Linking.openURL(plan.payment_link)}
+                >
+                  <Text style={styles.textBlue}>{plan.payment_link}</Text>
+                </TouchableOpacity>
               </Text>
               <Text style={styles.text}>
                 {"\u2022"} After payment send the screenshot of the transcation
@@ -288,7 +290,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   text: {
-    fontSize: 15,
+    fontSize: 17,
     paddingVertical: 2,
+  },
+  textBlue: {
+    fontSize: 17,
+    fontWeight: "bold",
+    color: "blue",
   },
 });

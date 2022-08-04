@@ -1,26 +1,67 @@
-import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Dimensions,
+  Alert,
+  ToastAndroid,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 
 import LottieView from "lottie-react-native";
-import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
+import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SplashScreen = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
-  useEffect(async () => {
-    const value = await AsyncStorage.getItem("GYM");
-    if (value != null) {
-      setTimeout(() => {
-        navigation.replace("Home");
-      }, 2500);
-    } else {
-      setTimeout(() => {
-        navigation.replace("Login");
-      }, 2500);
-    }
+  useEffect(() => {
+    check();
   }, []);
+
+  const check = async () => {
+    const value = await AsyncStorage.getItem("GYM");
+    NetInfo.fetch().then((state) => {
+      if (!state.isConnected) {
+        ToastAndroid.show(
+          "You are Offline, please check your internet connection!",
+          ToastAndroid.LONG
+        );
+      } else {
+        if (value != null) {
+          var today = new Date();
+          firestore()
+            .collection("GYM")
+            .doc(value)
+            .get()
+            .then((data) => {
+              var expiry_date = new Date(Date.UTC(1970, 0, 1)); // Epoch
+              expiry_date.setUTCSeconds(data._data.expiry_date.seconds);
+              if (expiry_date < today) {
+                ToastAndroid.show(
+                  "Your plan has expired please renew it",
+                  ToastAndroid.LONG
+                );
+                setTimeout(() => {
+                  navigation.replace("Subscription");
+                }, 1000);
+              } else {
+                setTimeout(() => {
+                  navigation.replace("Home");
+                }, 1000);
+              }
+            });
+        } else {
+          setTimeout(() => {
+            navigation.replace("Login");
+          }, 2000);
+        }
+      }
+    });
+  };
 
   return (
     <View style={styles.containerr}>
