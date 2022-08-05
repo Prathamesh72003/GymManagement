@@ -7,6 +7,7 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  ImageBackground,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 
@@ -160,10 +161,17 @@ const QuickAction = () => {
           <RefreshControl refreshing={initializing} onRefresh={onRefresh} />
         }
       >
-        <View style={styles.header}>
+        <ImageBackground
+          source={{
+            uri: "https://i.pinimg.com/736x/b2/73/34/b273344a354c91b8e0d43320fdf862e6.jpg",
+          }}
+          resizeMode="cover"
+          style={styles.header}
+        >
           <Text style={styles.headerTitle}>Quick Actions</Text>
           <Text style={{ color: "#ddd" }}>Pull to load changes</Text>
-        </View>
+        </ImageBackground>
+
         <View style={styles.body}>
           <View style={styles.row}>
             <Card
@@ -171,6 +179,9 @@ const QuickAction = () => {
               count={nearTermExpriy.length}
               membersData={nearTermExpriy}
               title={"Near term expiry"}
+              img={
+                "https://media.istockphoto.com/vectors/clock-icon-vector-illustration-eps10-vector-id906496194?k=20&m=906496194&s=612x612&w=0&h=LLTqxKYd573oMnUCMk122HjMPObyDnw3ACnFy0LPTcY="
+              }
               intent={"Members"}
             />
           </View>
@@ -183,6 +194,9 @@ const QuickAction = () => {
               count={totalMemberList.length}
               membersData={totalMemberList}
               title={"Total"}
+              img={
+                "https://cdn1.vectorstock.com/i/thumb-large/93/15/receipt-icon-total-bill-purchase-line-icon-vector-28489315.jpg"
+              }
               intent={"Members"}
             />
             <Card
@@ -190,6 +204,9 @@ const QuickAction = () => {
               count={activeMemberList.length}
               membersData={activeMemberList}
               title={"Active"}
+              img={
+                "https://cdn3.vectorstock.com/i/1000x1000/78/02/active-vector-28187802.jpg"
+              }
               intent={"Members"}
             />
           </View>
@@ -199,6 +216,9 @@ const QuickAction = () => {
               count={expiredMemberList.length}
               membersData={expiredMemberList}
               title={"Expired"}
+              img={
+                "https://cdn3.vectorstock.com/i/1000x1000/37/47/expiry-icon-vector-23503747.jpg"
+              }
               intent={"Members"}
             />
             <Card
@@ -206,6 +226,9 @@ const QuickAction = () => {
               count={blockMemberList.length}
               membersData={blockMemberList}
               title={"Blocked"}
+              img={
+                "https://t3.ftcdn.net/jpg/03/73/49/68/360_F_373496805_PSkJsVS0HoJpXFzou7sUmegyMNq9JUJZ.jpg"
+              }
               intent={"Members"}
             />
           </View>
@@ -255,7 +278,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: "#fff",
     fontSize: 25,
-    fontWeight: "600",
+    fontWeight: "bold",
   },
   body: {
     flex: 1,

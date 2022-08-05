@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   RefreshControl,
+  ImageBackground,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 
@@ -292,10 +293,16 @@ const Collections = ({ navigation }) => {
     >
       <View style={styles.container}>
         {/* date block */}
-        <View style={styles.header}>
+        <ImageBackground
+          source={{
+            uri: "https://i.pinimg.com/736x/b2/73/34/b273344a354c91b8e0d43320fdf862e6.jpg",
+          }}
+          resizeMode="cover"
+          style={styles.header}
+        >
           <Text style={styles.headerTitle}>Collection</Text>
           <Text style={{ color: "#ddd" }}>Pull to load changes</Text>
-        </View>
+        </ImageBackground>
         <View style={styles.body}>
           <View style={styles.block}>
             <Text style={styles.blockTitle}>Overall collection</Text>
@@ -572,7 +579,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: "#fff",
     fontSize: 25,
-    fontWeight: "600",
+    fontWeight: "bold",
   },
   body: {
     height: "100%",

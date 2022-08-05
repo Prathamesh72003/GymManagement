@@ -50,11 +50,13 @@ const Subscription = () => {
               discounted_price,
               name,
               org_price,
+              notAvailable,
               id,
               payment_link,
             } = doc.data();
             subsList.push({
               desc,
+              notAvailable,
               discounted_price,
               name,
               org_price,
@@ -154,7 +156,19 @@ const Subscription = () => {
                                 numberOfLines={1}
                                 style={{ width: "50%", marginBottom: 5 }}
                               >
-                                {"✔️" + " "}
+                                {"✅" + " "}
+                                {item1}
+                              </Text>
+                            );
+                          })}
+                          {item.notAvailable.map((item1, index) => {
+                            return (
+                              <Text
+                                key={index}
+                                numberOfLines={1}
+                                style={{ width: "50%", marginBottom: 5 }}
+                              >
+                                {"❌" + " "}
                                 {item1}
                               </Text>
                             );

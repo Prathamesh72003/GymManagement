@@ -47,11 +47,11 @@ const SplashScreen = ({ navigation }) => {
                 );
                 setTimeout(() => {
                   navigation.replace("Subscription");
-                }, 1000);
+                }, 1500);
               } else {
                 setTimeout(() => {
                   navigation.replace("Home");
-                }, 1000);
+                }, 1500);
               }
             });
         } else {
@@ -79,15 +79,16 @@ const SplashScreen = ({ navigation }) => {
       />
 
       <LottieView
-        source={require("../assets/watersplash.json")}
+        source={require("../assets/gym.json")}
         autoPlay
-        style={{ position: "absolute", width: 350, height: 350 }}
-        loop={false}
+        style={{ width: 350, height: 350 }}
+        loop
       />
-      <Image
+      <Text style={styles.appName}>Digi registry</Text>
+      {/* <Image
         style={styles.AppName}
         source={require("../assets/LogoName.png")}
-      />
+      /> */}
     </View>
   );
 };
@@ -104,8 +105,9 @@ const styles = StyleSheet.create({
     width: "100%",
   },
 
-  AppName: {
-    position: "absolute",
-    height: 80,
+  appName: {
+    fontWeight: "bold",
+    fontSize: 40,
+    textTransform: "uppercase",
   },
 });

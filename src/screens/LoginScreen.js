@@ -159,6 +159,7 @@ const LoginScreen = ({ navigation }) => {
                     borderRadius: 30,
                     elevation: 5,
                     backgroundColor: "#2F50C9",
+                    padding: 5,
                   }}
                   mode="contained"
                   onPress={() => loginFun()}

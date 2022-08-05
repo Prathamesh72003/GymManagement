@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import Entypo from "react-native-vector-icons/Entypo";
 import { useNavigation } from "@react-navigation/native";
@@ -22,7 +22,10 @@ const Card = (props) => {
         }}
       >
         <View style={styles.cardTop}>
-          <Text style={styles.cardTitle}>{props.title}</Text>
+          <View style={styles.cardRow}>
+            <Text style={styles.cardTitle}>{props.title}</Text>
+            <Image source={{ uri: props.img }} style={styles.img} />
+          </View>
 
           <Entypo name="chevron-right" size={25} color="#2f50c9" />
         </View>
@@ -45,6 +48,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
+    overflow: "hidden",
     elevation: 5,
   },
   cardTop: {
@@ -52,8 +56,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  cardRow: {
+    display: "flex",
+    flexDirection: "row",
+    // alignItems: "center",
+  },
   cardTitle: {
     fontSize: 20,
+    marginRight: 5,
+  },
+  img: {
+    height: 30,
+    width: 30,
+    resizeMode: "stretch",
   },
   cardBottom: {
     fontSize: 20,

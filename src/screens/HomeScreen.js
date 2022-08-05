@@ -6,6 +6,7 @@ import {
   View,
   ScrollView,
   ActivityIndicator,
+  ImageBackground,
   RefreshControl,
 } from "react-native";
 import React, { useState, useEffect } from "react";
@@ -41,6 +42,7 @@ const HomeScreen = ({ navigation }) => {
   const [totalMembers, setTotalMembers] = useState();
   const [chartLoading, setChartLoading] = useState(true);
   const [chartData, setChartData] = useState();
+  const [gymName, setGymName] = useState();
   const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => {
@@ -66,6 +68,7 @@ const HomeScreen = ({ navigation }) => {
           setTotalServices(documentSnapshot.data().services);
           setTotalPlans(documentSnapshot.data().plans);
           setTotalMembers(documentSnapshot.data().members);
+          setGymName(documentSnapshot.data().gymname);
         }
       });
 
@@ -175,16 +178,25 @@ const HomeScreen = ({ navigation }) => {
         }
       >
         <View styles={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Universal GYM</Text>
+          <ImageBackground
+            source={{
+              uri: "https://i.pinimg.com/736x/b2/73/34/b273344a354c91b8e0d43320fdf862e6.jpg",
+            }}
+            resizeMode="cover"
+            style={styles.header}
+          >
+            <Text style={styles.headerTitle}>{gymName}</Text>
             <Text style={{ color: "#ddd" }}>Pull to load changes</Text>
-          </View>
+          </ImageBackground>
           <View style={styles.body}>
             <View style={styles.row}>
               <Card
                 width={"100%"}
                 count={totalMembers}
                 title={"Members"}
+                img={
+                  "https://thumbs.dreamstime.com/b/people-group-vector-icon-isolated-white-background-people-group-vector-icon-isolated-white-background-png-130270859.jpg"
+                }
                 intent={"Members"}
               />
             </View>
@@ -193,12 +205,18 @@ const HomeScreen = ({ navigation }) => {
                 width={"45%"}
                 count={totalPlans}
                 title={"Plans"}
+                img={
+                  "https://media.istockphoto.com/vectors/plan-icon-vector-isolated-on-white-background-plan-sign-line-or-sign-vector-id1029082142"
+                }
                 intent={"Plans"}
               />
               <Card
                 width={"45%"}
                 count={totalServices}
                 title={"Services"}
+                img={
+                  "https://cdn3.vectorstock.com/i/1000x1000/50/87/top-services-flat-icon-vector-21175087.jpg"
+                }
                 intent={"Services"}
               />
             </View>
@@ -255,7 +273,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: "#fff",
     fontSize: 25,
-    fontWeight: "600",
+    fontWeight: "bold",
   },
   body: {
     height: "100%",

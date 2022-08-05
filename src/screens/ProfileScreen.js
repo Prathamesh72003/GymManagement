@@ -7,6 +7,8 @@ import {
   ActivityIndicator,
   RefreshControl,
   Share,
+  ImageBackground,
+  Linking,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
@@ -91,8 +93,8 @@ const ProfileScreen = ({ navigation }) => {
       const result = await Share.share({
         title: "App link",
         message:
-          "Hey there checkout this amazing management app I found! , AppLink : https://google.com",
-        url: "https://google.com",
+          "Hey there checkout this amazing management app I found! , AppLink: https://github.com/somesh4545/GYM/blob/main/README.md",
+        url: "https://github.com/somesh4545/GYM/blob/main/README.md",
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -113,10 +115,16 @@ const ProfileScreen = ({ navigation }) => {
       }
     >
       <View styles={styles.container}>
-        <View style={styles.header}>
+        <ImageBackground
+          source={{
+            uri: "https://i.pinimg.com/736x/b2/73/34/b273344a354c91b8e0d43320fdf862e6.jpg",
+          }}
+          resizeMode="cover"
+          style={styles.header}
+        >
           <Text style={styles.headerTitle}>Profile</Text>
           <Text style={{ color: "#ddd" }}>Pull to load changes</Text>
-        </View>
+        </ImageBackground>
         <View style={styles.body}>
           <View style={styles.upperConatiner}>
             <View style={styles.ImageNdName}>
@@ -209,7 +217,7 @@ const ProfileScreen = ({ navigation }) => {
 
           <View style={styles.LowerContainer}>
             <View style={styles.TabList}>
-              <TouchableOpacity>
+              {/* <TouchableOpacity>
                 <View style={styles.listItem}>
                   <View style={styles.Icon}>
                     <FontAwesome5 name="download" size={22} color={"#2f50c9"} />
@@ -218,7 +226,7 @@ const ProfileScreen = ({ navigation }) => {
                     <Text style={styles.ListText}>Download members list</Text>
                   </View>
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity
                 onPress={() => {
                   share();
@@ -247,7 +255,9 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => Linking.openURL("https://youtube.com")}
+              >
                 <View style={styles.listItem}>
                   <View style={styles.Icon}>
                     <FontAwesome5 name="question" size={22} color={"#2f50c9"} />
@@ -257,7 +267,7 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity>
+              {/* <TouchableOpacity>
                 <View style={styles.listItem}>
                   <View style={styles.Icon}>
                     <FontAwesome5 name="info" size={22} color={"#2f50c9"} />
@@ -268,7 +278,7 @@ const ProfileScreen = ({ navigation }) => {
                     </Text>
                   </View>
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity onPress={logout}>
                 <View style={styles.listItem}>
                   <View style={styles.Icon}>
@@ -308,7 +318,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: "#fff",
     fontSize: 25,
-    fontWeight: "600",
+    fontWeight: "bold",
   },
   body: {
     height: "100%",
