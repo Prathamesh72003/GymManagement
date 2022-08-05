@@ -186,7 +186,7 @@ const AddMember = ({ navigation }) => {
       id: 1,
       joining_date: joiningDate,
       name: name,
-      phone_no: phoneNO,
+      phone_no: "91" + phoneNO,
       dob: dob,
       address: address,
       injury: injury,
