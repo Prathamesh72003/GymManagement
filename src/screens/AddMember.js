@@ -368,8 +368,6 @@ const AddMember = ({ navigation }) => {
                 mode="date"
                 placeholder="select date"
                 format="YYYY-MM-DD"
-                minDate="2022-06-01"
-                maxDate="2022-08-01"
                 confirmBtnText="Confirm"
                 cancelBtnText="Cancel"
                 customStyles={{
@@ -384,7 +382,7 @@ const AddMember = ({ navigation }) => {
                   // ... You can check the source to find the other keys.
                 }}
                 onDateChange={(date) => {
-                  setJoiningDate(date);
+                  setJoiningDate(new Date(date));
                 }}
               />
             </View>
@@ -512,7 +510,7 @@ const AddMember = ({ navigation }) => {
                   // ... You can check the source to find the other keys.
                 }}
                 onDateChange={(date) => {
-                  setDob(date);
+                  setDob(new Date(date));
                 }}
               />
             </View>

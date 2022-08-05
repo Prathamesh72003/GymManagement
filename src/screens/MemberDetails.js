@@ -353,14 +353,14 @@ const MemberDetails = ({ route, navigation }) => {
                       </Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity>
+                  {/* <TouchableOpacity>
                     <View style={styles.quicktab}>
                       <FontAwesome5 name="marker" size={22} color={"#2f50c9"} />
                       <Text style={{ fontSize: 10, fontWeight: "bold" }}>
                         Attendance
                       </Text>
                     </View>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                   <TouchableOpacity onPress={() => banfun()}>
                     {data.block == true ? (
                       <View style={styles.quicktab}>

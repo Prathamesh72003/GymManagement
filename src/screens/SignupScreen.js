@@ -55,9 +55,9 @@ const SignupScreen = ({ navigation }) => {
               date: today,
               expiry_date: expiry_date,
               plan_type: "free",
-              plans: "0",
-              services: "0",
-              members: "0",
+              plans: 0,
+              services: 0,
+              members: 0,
             })
             .then(() => {
               console.log("User added to firebase");
@@ -77,20 +77,23 @@ const SignupScreen = ({ navigation }) => {
               ToastAndroid.SHORT,
               ToastAndroid.CENTER
             );
-          }
-
-          if (error.code === "auth/invalid-email") {
+          } else if (error.code === "auth/invalid-email") {
             // console.log('That email address is invalid!');
             ToastAndroid.show(
               "The email address is invalid!",
               ToastAndroid.SHORT,
               ToastAndroid.CENTER
             );
-          }
-          if (error.code === "auth/weak-password") {
+          } else if (error.code === "auth/weak-password") {
             // console.log('Password should be more than 6 digits!');
             ToastAndroid.show(
               "Password should be more than 6 digits!",
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER
+            );
+          } else {
+            ToastAndroid.show(
+              "" + error.message,
               ToastAndroid.SHORT,
               ToastAndroid.CENTER
             );
@@ -115,7 +118,7 @@ const SignupScreen = ({ navigation }) => {
                 style={{color: '#fff'}}
               /> */}
 
-            <Text style={styles.BrandText}> GYM BOOK</Text>
+            <Text style={styles.BrandText}>Digi registry</Text>
           </View>
         </ImageBackground>
         <View style={styles.bottomContainer}>
@@ -226,6 +229,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#fff",
     fontWeight: "bold",
+    textTransform: "uppercase",
   },
   bottomContainer: {
     flex: 1.5,

@@ -81,7 +81,7 @@ const LoginScreen = ({ navigation }) => {
           style={{ height: height / 2.5 }}
         >
           <View style={styles.UpperContainer}>
-            <Text style={styles.BrandText}>GYM BOOK</Text>
+            <Text style={styles.BrandText}>Digi registry</Text>
           </View>
         </ImageBackground>
         <View style={styles.bottomContainer}>
@@ -197,6 +197,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#fff",
     fontWeight: "bold",
+    textTransform: "uppercase",
   },
   bottomContainer: {
     flex: 1.5,
