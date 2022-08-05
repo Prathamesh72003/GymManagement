@@ -108,11 +108,11 @@ const AddPlanToMember = ({ route, navigation }) => {
       })
       .then(() => {
         ToastAndroid.show("Plan added successfully !", ToastAndroid.SHORT);
-        const increment = firestore.FieldValue.increment(1);
+        // const increment = firestore.FieldValue.increment(1);
 
-        firestore().collection("GYM").doc(GYM_OWNER_EMAIL_ID).update({
-          plans: increment,
-        });
+        // firestore().collection("GYM").doc(GYM_OWNER_EMAIL_ID).update({
+        //   plans: increment,
+        // });
 
         getUpdatedDocument(id);
       });

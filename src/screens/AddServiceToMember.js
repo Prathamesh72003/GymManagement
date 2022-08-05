@@ -105,11 +105,11 @@ const AddServiceToMember = ({ route, navigation }) => {
       })
       .then(() => {
         ToastAndroid.show("Service added successfully !", ToastAndroid.SHORT);
-        const increment = firestore.FieldValue.increment(1);
+        // const increment = firestore.FieldValue.increment(1);
 
-        firestore().collection("GYM").doc(GYM_OWNER_EMAIL_ID).update({
-          services: increment,
-        });
+        // firestore().collection("GYM").doc(GYM_OWNER_EMAIL_ID).update({
+        //   services: increment,
+        // });
 
         getUpdatedDocument(id);
       });

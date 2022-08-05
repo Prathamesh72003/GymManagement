@@ -206,7 +206,6 @@ const AddMember = ({ navigation }) => {
         var id = ref._documentPath._parts[3];
         firestore().collection("GYM").doc(GYM_OWNER_EMAIL_ID).update({
           members: increment,
-          plans: increment,
         });
         firestore()
           .collection("GYM")
