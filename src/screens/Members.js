@@ -5,15 +5,17 @@ import {
   View,
   ActivityIndicator,
   TouchableOpacity,
+  ToastAndroid,
   TextInput,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
-import { FAB, Provider } from "react-native-paper";
+import { FAB, Provider, Modal, Portal } from "react-native-paper";
 import MemberCard from "./../components/MemberCard";
 import firestore from "@react-native-firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+
 const data = [
   {
     id: 1,
@@ -36,11 +38,22 @@ const data = [
 ];
 
 const Members = ({ route, navigation }) => {
+  const [phoneNOList, setPhoneNOList] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [initializing, setInitializing] = useState(true);
+  const [gymName, setGymName] = useState();
   const [text, setText] = useState("");
+
+  const [availableCredits, setAvailableCredits] = useState();
+  const [requiredCredits, setRequiredCredits] = useState();
+  const [message, setMessage] = useState("");
+
+  const [visible, setVisible] = React.useState(false);
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+
   useEffect(() => {
     if (route.params == null) {
       getMembers();
@@ -56,6 +69,7 @@ const Members = ({ route, navigation }) => {
       const value = await AsyncStorage.getItem("GYM");
 
       const membersList = [];
+      const phoneList = [];
       await firestore()
         .collection("GYM")
         .doc(value)
@@ -77,6 +91,7 @@ const Members = ({ route, navigation }) => {
               dob,
               profileImg,
             } = doc.data();
+            phoneList.push(phone_no);
             membersList.push({
               id,
               email_id,
@@ -95,6 +110,7 @@ const Members = ({ route, navigation }) => {
         });
       setAllUsers(membersList);
       setFilteredUsers(membersList);
+      setPhoneNOList(phoneList);
       setInitializing(false);
     } catch (error) {
       console.log("eee" + error);
@@ -115,6 +131,61 @@ const Members = ({ route, navigation }) => {
       setSearch(text);
     }
   };
+
+  const showMessageForm = async () => {
+    setInitializing(true);
+
+    const value = await AsyncStorage.getItem("GYM");
+    await firestore()
+      .collection("GYM")
+      .doc(value)
+      .get()
+      .then((result) => {
+        if (result._data.plan_type == "Annual") {
+          var required_credits = phoneNOList.length;
+          var available_credits = result._data.msg_credits;
+
+          setRequiredCredits(required_credits);
+          setAvailableCredits(available_credits);
+          setGymName(result._data.gymname);
+
+          showModal();
+        } else {
+          ToastAndroid.show(
+            "To send message upgrade to annual plan",
+            ToastAndroid.SHORT
+          );
+        }
+      });
+
+    setInitializing(false);
+  };
+
+  const sendMessage = async () => {
+    if (message.length != 0) {
+      setInitializing(true);
+      hideModal();
+
+      // send text message main code here
+      var gym_name = gymName; // use this to let user know from which gym message is from
+
+      // updating value in firebase
+      const value = await AsyncStorage.getItem("GYM");
+      var new_credits = availableCredits - requiredCredits;
+      var numbers = phoneNOList;
+      await firestore().collection("GYM").doc(value).update({
+        msg_credits: new_credits,
+      });
+
+      ToastAndroid.show("Message successfully send", ToastAndroid.SHORT);
+
+      setInitializing(false);
+    } else {
+      ToastAndroid.show("Type your message in input field", ToastAndroid.SHORT);
+    }
+  };
+
+  const containerStyle = { backgroundColor: "white", padding: 20, margin: 20 };
 
   if (initializing) {
     return (
@@ -139,7 +210,7 @@ const Members = ({ route, navigation }) => {
         <Provider>
           <View style={styles.body}>
             <View style={styles.SearchConatiner}>
-            <FontAwesome5 name="search" size={18} color={"#000"} />
+              <FontAwesome5 name="search" size={18} color={"#000"} />
               <TextInput
                 style={styles.textInputStyle}
                 onChangeText={(text) => searchUser(text)}
@@ -170,14 +241,81 @@ const Members = ({ route, navigation }) => {
               })
             )}
           </View>
+          <Portal>
+            <Modal
+              visible={visible}
+              onDismiss={hideModal}
+              contentContainerStyle={containerStyle}
+            >
+              {requiredCredits > availableCredits ? (
+                <>
+                  <Text style={styles.boldText}>
+                    You are short of message credits
+                  </Text>
+                  <Text style={styles.text}>
+                    Your available message credits are {availableCredits}
+                  </Text>
+                  <Text style={styles.text}>
+                    You required {requiredCredits} message credits
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <TextInput
+                    multiline
+                    placeholder="Type your message max 200 characters"
+                    style={styles.input}
+                    value={message}
+                    maxLength={200}
+                    onChangeText={(text) => setMessage(text)}
+                  />
+                  <Text style={styles.textSmall}>
+                    After this transcation you will have{" "}
+                    {availableCredits - requiredCredits} message credits
+                  </Text>
+                </>
+              )}
+              <View style={styles.modalRow}>
+                <TouchableOpacity onPress={() => hideModal()}>
+                  <Text>Close</Text>
+                </TouchableOpacity>
+                {requiredCredits > availableCredits ? (
+                  <TouchableOpacity style={styles.modalBtn} onPress={() => {}}>
+                    <Text style={{ color: "#fff" }}>Buy credits</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.modalBtn}
+                    onPress={() => {
+                      sendMessage();
+                    }}
+                  >
+                    <Text style={{ color: "#fff", fontSize: 18 }}>
+                      Send Message
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </Modal>
+          </Portal>
         </Provider>
       </ScrollView>
-      <FAB
-        color={"#fff"}
-        icon="plus"
-        style={styles.fab}
-        onPress={() => navigation.navigate("AddMember")}
-      />
+      {visible ? null : (
+        <>
+          <FAB
+            color={"#fff"}
+            icon="message"
+            style={styles.messageBtn}
+            onPress={() => showMessageForm()}
+          />
+          <FAB
+            color={"#fff"}
+            icon="plus"
+            style={styles.addMemberBtn}
+            onPress={() => navigation.navigate("AddMember")}
+          />
+        </>
+      )}
     </>
   );
 };
@@ -211,13 +349,51 @@ const styles = StyleSheet.create({
     height: 45,
     paddingLeft: 10,
     margin: 5,
-    color: '#000'
+    color: "#000",
   },
-  fab: {
+  messageBtn: {
+    position: "absolute",
+    margin: 16,
+    right: 20,
+    bottom: 100,
+    backgroundColor: "#000",
+  },
+  addMemberBtn: {
     position: "absolute",
     margin: 16,
     right: 20,
     bottom: 30,
     backgroundColor: "#2f50c9",
+  },
+  input: {
+    height: 100,
+    backgroundColor: "#fff",
+    width: "100%",
+    padding: 5,
+    borderWidth: 1,
+    borderColor: "#000",
+    marginBottom: 10,
+  },
+  modalRow: {
+    marginTop: 15,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  modalBtn: {
+    padding: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    backgroundColor: "#2f50c9",
+  },
+  boldText: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  text: {
+    fontSize: 15,
+  },
+  textSmall: {
+    fontSize: 13,
   },
 });

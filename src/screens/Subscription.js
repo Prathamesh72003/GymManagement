@@ -11,18 +11,7 @@ import {
   Linking,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import {
-  Avatar,
-  Button,
-  Card,
-  Title,
-  Paragraph,
-  RadioButton,
-  Modal,
-  Provider,
-  Portal,
-  Divider,
-} from "react-native-paper";
+import { Button, Card, Modal, Provider, Portal } from "react-native-paper";
 import firestore from "@react-native-firebase/firestore";
 
 const { width, height } = Dimensions.get("window");

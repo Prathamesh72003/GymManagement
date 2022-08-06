@@ -55,6 +55,7 @@ const SignupScreen = ({ navigation }) => {
               date: today,
               expiry_date: expiry_date,
               plan_type: "free",
+              msg_credits: 0,
               plans: 0,
               services: 0,
               members: 0,
