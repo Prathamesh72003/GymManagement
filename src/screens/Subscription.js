@@ -204,7 +204,7 @@ const Subscription = () => {
               </Text>
               <Text style={styles.text}>
                 {"\u2022"} After payment send the screenshot of the transcation
-                to this number
+                to this number 8080259833
               </Text>
               <Text style={styles.text}>
                 {"\u2022"} Your plan would be started immediately after

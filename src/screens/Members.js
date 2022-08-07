@@ -15,34 +15,16 @@ import MemberCard from "./../components/MemberCard";
 import firestore from "@react-native-firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import axios from "axios";
 
-const data = [
-  {
-    id: 1,
-    gender: "male",
-    name: "john",
-    plan: "12 month",
-    planExpiry: "21st june",
-    dueAmount: 100,
-    phoneNumber: "808025983",
-  },
-  {
-    id: 2,
-    gender: "female",
-    name: "bob",
-    plan: "4 month",
-    planExpiry: "21st june",
-    dueAmount: 0,
-    phoneNumber: "808025983",
-  },
-];
+const baseUrl = "https://www.fast2sms.com/dev/bulkV2";
 
 const Members = ({ route, navigation }) => {
   const [phoneNOList, setPhoneNOList] = useState([]);
+  const [initializing, setInitializing] = useState(true);
   const [allUsers, setAllUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [search, setSearch] = useState("");
-  const [initializing, setInitializing] = useState(true);
   const [gymName, setGymName] = useState();
   const [text, setText] = useState("");
 
@@ -58,6 +40,11 @@ const Members = ({ route, navigation }) => {
     if (route.params == null) {
       getMembers();
     } else {
+      var phone_list = [];
+      route.params.membersData.map((member) =>
+        phone_list.push(member.phone_no)
+      );
+      setPhoneNOList(phone_list);
       setAllUsers(route.params.membersData);
       setFilteredUsers(route.params.membersData);
       setInitializing(false);
@@ -108,6 +95,7 @@ const Members = ({ route, navigation }) => {
             });
           });
         });
+      console.log(phoneList);
       setAllUsers(membersList);
       setFilteredUsers(membersList);
       setPhoneNOList(phoneList);
@@ -141,10 +129,13 @@ const Members = ({ route, navigation }) => {
       .doc(value)
       .get()
       .then((result) => {
-        if (result._data.plan_type == "Annual") {
+        if (
+          result._data.plan_type == "Annual" ||
+          result._data.plan_type == "HalfYearly"
+        ) {
           var required_credits = phoneNOList.length;
           var available_credits = result._data.msg_credits;
-
+          console.log(available_credits, required_credits);
           setRequiredCredits(required_credits);
           setAvailableCredits(available_credits);
           setGymName(result._data.gymname);
@@ -152,8 +143,8 @@ const Members = ({ route, navigation }) => {
           showModal();
         } else {
           ToastAndroid.show(
-            "To send message upgrade to annual plan",
-            ToastAndroid.SHORT
+            "To send message upgrade to annual or half yearly plan",
+            ToastAndroid.LONG
           );
         }
       });
@@ -168,17 +159,39 @@ const Members = ({ route, navigation }) => {
 
       // send text message main code here
       var gym_name = gymName; // use this to let user know from which gym message is from
+      // const numbers = phoneNOList.join(",");
+      var numbers = "";
+      phoneNOList.map((num) => {
+        numbers += num.slice(2) + ",";
+      });
+      numbers.slice(0, -1);
+
+      const url =
+        " https://www.fast2sms.com/dev/bulkV2?authorization=JCDv7FSl1P5IgxmAz0kfw64QRbVchT8OdUMetZ2YXKEHiWryGaNdhi0jmZU4QVLGtlsJWDr6eO7KuYHX&route=v3&sender_id=FTWSMS&message=" +
+        gym_name +
+        ", " +
+        message +
+        "&language=english&flash=0&numbers=" +
+        numbers;
+
+      axios
+        .get(url)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
       // updating value in firebase
       const value = await AsyncStorage.getItem("GYM");
       var new_credits = availableCredits - requiredCredits;
-      var numbers = phoneNOList;
       await firestore().collection("GYM").doc(value).update({
         msg_credits: new_credits,
       });
 
       ToastAndroid.show("Message successfully send", ToastAndroid.SHORT);
-
+      setMessage("");
       setInitializing(false);
     } else {
       ToastAndroid.show("Type your message in input field", ToastAndroid.SHORT);
@@ -263,10 +276,10 @@ const Members = ({ route, navigation }) => {
                 <>
                   <TextInput
                     multiline
-                    placeholder="Type your message max 200 characters"
+                    placeholder="Type your message max 80 characters"
                     style={styles.input}
                     value={message}
-                    maxLength={200}
+                    maxLength={80}
                     onChangeText={(text) => setMessage(text)}
                   />
                   <Text style={styles.textSmall}>
@@ -372,6 +385,7 @@ const styles = StyleSheet.create({
     padding: 5,
     borderWidth: 1,
     borderColor: "#000",
+    color: "#000",
     marginBottom: 10,
   },
   modalRow: {

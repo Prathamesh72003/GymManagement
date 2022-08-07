@@ -42,7 +42,7 @@ export default Card;
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
-    padding: 20,
+    padding: 10,
     borderRadius: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },

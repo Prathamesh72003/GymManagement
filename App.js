@@ -22,6 +22,7 @@ import Collections from "./src/screens/Collections";
 import MemberDetails from "./src/screens/MemberDetails";
 import AddPlanToMember from "./src/screens/AddPlanToMember";
 import AddServiceToMember from "./src/screens/AddServiceToMember";
+import PaymentReminder from "./src/screens/PaymentReminder";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -165,6 +166,11 @@ const App = () => {
           options={{ headerShown: true }}
           name="AddServiceToMember"
           component={AddServiceToMember}
+        />
+        <Stack.Screen
+          options={{ headerShown: true }}
+          name="PaymentReminder"
+          component={PaymentReminder}
         />
       </Stack.Navigator>
     </NavigationContainer>

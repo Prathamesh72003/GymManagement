@@ -143,9 +143,10 @@ const SignupScreen = ({ navigation }) => {
             <View style={styles.formContainer}>
               <TextInput
                 style={styles.inputContainer}
-                label="Gym Name"
+                label="Academy name max 15 characters"
                 activeOutlineColor="#2F50C9"
                 value={gymname}
+                maxLength={15}
                 onChangeText={(text) => setGymname(text)}
                 mode="outlined"
               />

@@ -8,6 +8,7 @@ import {
   RefreshControl,
   Share,
   ImageBackground,
+  ToastAndroid,
   Linking,
 } from "react-native";
 import React, { useState, useEffect } from "react";
@@ -117,7 +118,7 @@ const ProfileScreen = ({ navigation }) => {
       <View styles={styles.container}>
         <ImageBackground
           source={{
-            uri: "https://i.pinimg.com/736x/b2/73/34/b273344a354c91b8e0d43320fdf862e6.jpg",
+            uri: "https://media.istockphoto.com/vectors/football-championship-background-vector-id540383298?k=20&m=540383298&s=612x612&w=0&h=Eh4Ie-Ki_a0aOhUw7D3R7qrIa40LhGzq76mkqzzczwA=",
           }}
           resizeMode="cover"
           style={styles.header}
@@ -227,6 +228,38 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
                 </View>
               </TouchableOpacity> */}
+              {/* <TouchableOpacity
+                onPress={() => {
+                  ToastAndroid.show("In progress", ToastAndroid.LONG);
+                }}
+              >
+                <View style={styles.listItem}>
+                  <View style={styles.Icon}>
+                    <FontAwesome5 name="sms" size={22} color={"#2f50c9"} />
+                  </View>
+                  <View style={styles.ListTextContainer}>
+                    <Text style={styles.ListText}>Make announcement</Text>
+                  </View>
+                </View>
+              </TouchableOpacity> */}
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("PaymentReminder");
+                }}
+              >
+                <View style={styles.listItem}>
+                  <View style={styles.Icon}>
+                    <FontAwesome5
+                      name="money-bill"
+                      size={22}
+                      color={"#2f50c9"}
+                    />
+                  </View>
+                  <View style={styles.ListTextContainer}>
+                    <Text style={styles.ListText}>Send payment reminder</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   share();

@@ -65,7 +65,7 @@ const SplashScreen = ({ navigation }) => {
 
   return (
     <View style={styles.containerr}>
-      <LottieView
+      {/* <LottieView
         source={require("../assets/splash.json")}
         autoPlay
         resizeMode="cover"
@@ -76,10 +76,10 @@ const SplashScreen = ({ navigation }) => {
           flexGrow: 1,
         }}
         loop={false}
-      />
+      /> */}
 
       <LottieView
-        source={require("../assets/gym.json")}
+        source={require("../assets/splash.json")}
         autoPlay
         style={{ width: 350, height: 350 }}
         loop
@@ -98,7 +98,7 @@ export default SplashScreen;
 const styles = StyleSheet.create({
   containerr: {
     display: "flex",
-    backgroundColor: "#fff",
+    backgroundColor: "#2f50c9",
     alignItems: "center",
     justifyContent: "center",
     height: "100%",
@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
   },
 
   appName: {
+    color: "#fff",
     fontWeight: "bold",
     fontSize: 40,
     textTransform: "uppercase",

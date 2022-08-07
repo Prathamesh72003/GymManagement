@@ -163,7 +163,7 @@ const QuickAction = () => {
       >
         <ImageBackground
           source={{
-            uri: "https://i.pinimg.com/736x/b2/73/34/b273344a354c91b8e0d43320fdf862e6.jpg",
+            uri: "https://media.istockphoto.com/vectors/football-championship-background-vector-id540383298?k=20&m=540383298&s=612x612&w=0&h=Eh4Ie-Ki_a0aOhUw7D3R7qrIa40LhGzq76mkqzzczwA=",
           }}
           resizeMode="cover"
           style={styles.header}

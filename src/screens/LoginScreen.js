@@ -120,7 +120,7 @@ const LoginScreen = ({ navigation }) => {
                 onChangeText={(text) => setPassword(text)}
                 mode="outlined"
               />
-              <View style={styles.forgotPassword}>
+              {/* <View style={styles.forgotPassword}>
                 <View
                   style={{
                     display: "flex",
@@ -151,7 +151,7 @@ const LoginScreen = ({ navigation }) => {
                     Reset
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </View> */}
               <View style={styles.loginBtnContainer}>
                 <Button
                   style={{
