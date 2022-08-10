@@ -296,7 +296,7 @@ const ProfileScreen = ({ navigation }) => {
                     <FontAwesome5 name="question" size={22} color={"#2f50c9"} />
                   </View>
                   <View style={styles.ListTextContainer}>
-                    <Text style={styles.ListText}>How to use gymbook</Text>
+                    <Text style={styles.ListText}>How to use digi registry</Text>
                   </View>
                 </View>
               </TouchableOpacity>

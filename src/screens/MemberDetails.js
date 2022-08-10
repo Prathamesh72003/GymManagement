@@ -353,14 +353,14 @@ const MemberDetails = ({ route, navigation }) => {
                       </Text>
                     </View>
                   </TouchableOpacity>
-                  {/* <TouchableOpacity>
+                  <TouchableOpacity onPress={() => {navigation.navigate("EditMember", {data: data})}}>
                     <View style={styles.quicktab}>
-                      <FontAwesome5 name="marker" size={22} color={"#2f50c9"} />
+                      <FontAwesome5 name="pen" size={22} color={"#2f50c9"} />
                       <Text style={{ fontSize: 10, fontWeight: "bold" }}>
-                        Attendance
+                        Edit Profile
                       </Text>
                     </View>
-                  </TouchableOpacity> */}
+                  </TouchableOpacity>
                   <TouchableOpacity onPress={() => banfun()}>
                     {data.block == true ? (
                       <View style={styles.quicktab}>

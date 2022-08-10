@@ -167,7 +167,7 @@ const Members = ({ route, navigation }) => {
       numbers.slice(0, -1);
 
       const url =
-        " https://www.fast2sms.com/dev/bulkV2?authorization=JCDv7FSl1P5IgxmAz0kfw64QRbVchT8OdUMetZ2YXKEHiWryGaNdhi0jmZU4QVLGtlsJWDr6eO7KuYHX&route=v3&sender_id=FTWSMS&message=" +
+        " https://www.fast2sms.com/dev/bulkV2?authorization=XbZW1luNkpaLDq5oVFnxyAmr07evi3P6dG8SEw2MUBIg9tzsRKSfxKcgAOH0bm9JC4MownkR3YdyI8Pe&route=v3&sender_id=FTWSMS&message=" +
         gym_name +
         ", " +
         message +
