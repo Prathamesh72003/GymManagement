@@ -41,6 +41,7 @@ const AddServiceToMember = ({ route, navigation }) => {
         .get();
       var i = 1;
       var list = [];
+
       Services_data._docs.map((Service) => {
         var data = Service._data;
         var obj = {
@@ -53,6 +54,11 @@ const AddServiceToMember = ({ route, navigation }) => {
         list.push(obj);
         i++;
       });
+      if (list.length == 0) {
+        ToastAndroid.show("Please add a service first", ToastAndroid.LONG);
+
+        navigation.replace("AddService");
+      }
       setServices(list);
       setSelectedService(list[0]);
       setDueAmount(list[0].amount);

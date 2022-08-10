@@ -100,10 +100,41 @@ const MemberDetails = ({ route, navigation }) => {
           block: true,
         })
         .then(() => {
+          const decrement = firestore.FieldValue.increment(-1);
+
+          firestore().collection("GYM").doc(value).update({
+            members: decrement,
+          });
           console.log("Blocked");
           ToastAndroid.show("Member Banned successfully!", ToastAndroid.SHORT);
         });
     } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteMember = async () => {
+    setInitializing(true);
+    const value = await AsyncStorage.getItem("GYM");
+    try {
+      firestore()
+        .collection("GYM")
+        .doc(value)
+        .collection("MEMBERS")
+        .doc(data.id)
+        .delete()
+        .then(() => {
+          const decrement = firestore.FieldValue.increment(-1);
+
+          firestore().collection("GYM").doc(value).update({
+            members: decrement,
+          });
+          ToastAndroid.show("Member deleted successfully!", ToastAndroid.SHORT);
+          setInitializing(false);
+          navigation.replace("Members");
+        });
+    } catch (error) {
+      setInitializing(false);
       console.log(error);
     }
   };
@@ -251,6 +282,75 @@ const MemberDetails = ({ route, navigation }) => {
     navigation.replace("MemberDetails", { data: member._data });
   };
 
+  const deletePlan = async (plan, index) => {
+    setInitializing(true);
+
+    const GYM_OWNER_EMAIL_ID = await AsyncStorage.getItem("GYM");
+    plan = JSON.stringify(plan);
+
+    await firestore()
+      .collection("GYM")
+      .doc(GYM_OWNER_EMAIL_ID)
+      .collection("MEMBERS")
+      .doc(data.id)
+      .update({ plans: firestore.FieldValue.arrayRemove(plan) })
+      .then(() => {
+        console.log("Document successfully updated!");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    const member = await firestore()
+      .collection("GYM")
+      .doc(GYM_OWNER_EMAIL_ID)
+      .collection("MEMBERS")
+      .doc(data.id)
+      .get();
+    setInitializing(false);
+    navigation.replace("MemberDetails", { data: member._data });
+  };
+
+  const deleteService = async (ser, index) => {
+    setInitializing(true);
+
+    const GYM_OWNER_EMAIL_ID = await AsyncStorage.getItem("GYM");
+    ser = JSON.stringify(ser);
+
+    await firestore()
+      .collection("GYM")
+      .doc(GYM_OWNER_EMAIL_ID)
+      .collection("MEMBERS")
+      .doc(data.id)
+      .update({ service: firestore.FieldValue.arrayRemove(ser) })
+      .then(() => {
+        console.log("Document successfully updated!");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    const member = await firestore()
+      .collection("GYM")
+      .doc(GYM_OWNER_EMAIL_ID)
+      .collection("MEMBERS")
+      .doc(data.id)
+      .get();
+    setInitializing(false);
+    navigation.replace("MemberDetails", { data: member._data });
+  };
+
+  const whatsappFun = (phone_no, name) => {
+    Linking.openURL(
+      "whatsapp://send?text=Hello " +
+        name +
+        ", this message is to to inform you about&phone=" +
+        phone_no
+    );
+  };
+
+  const phoneFun = (phone_no) => {
+    Linking.openURL(`tel:${phone_no}`);
+  };
+
   if (initializing) {
     return (
       <View
@@ -265,19 +365,6 @@ const MemberDetails = ({ route, navigation }) => {
       </View>
     );
   }
-
-  const whatsappFun = (phone_no, name) => {
-    Linking.openURL(
-      "whatsapp://send?text=Hello " +
-        name +
-        ", this message is to to inform you about&phone=" +
-        phone_no
-    );
-  };
-
-  const phoneFun = (phone_no) => {
-    Linking.openURL(`tel:${phone_no}`);
-  };
 
   return (
     <View style={{ backgroundColor: "#2f50c9", height: "100%" }}>
@@ -353,11 +440,23 @@ const MemberDetails = ({ route, navigation }) => {
                       </Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => {navigation.navigate("EditMember", {data: data})}}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("EditMember", { data: data });
+                    }}
+                  >
                     <View style={styles.quicktab}>
                       <FontAwesome5 name="pen" size={22} color={"#2f50c9"} />
                       <Text style={{ fontSize: 10, fontWeight: "bold" }}>
                         Edit Profile
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => deleteMember()}>
+                    <View style={styles.quicktab}>
+                      <FontAwesome5 name="trash" size={22} color={"red"} />
+                      <Text style={{ fontSize: 10, fontWeight: "bold" }}>
+                        Delete
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -465,6 +564,17 @@ const MemberDetails = ({ route, navigation }) => {
                             <Text style={styles.PlanAmount}>
                               Price: {plan.amount}
                             </Text>
+                            <TouchableOpacity
+                              onPress={() => {
+                                deletePlan(plan, index);
+                              }}
+                            >
+                              <FontAwesome5
+                                name="trash"
+                                size={15}
+                                color={"red"}
+                              />
+                            </TouchableOpacity>
                           </View>
                           <View style={styles.datesAndPayment}>
                             <View style={styles.PlansInfo}>
@@ -540,6 +650,17 @@ const MemberDetails = ({ route, navigation }) => {
                             <Text style={styles.PlanAmount}>
                               Price: {service.amount}
                             </Text>
+                            <TouchableOpacity
+                              onPress={() => {
+                                deleteService(service, index);
+                              }}
+                            >
+                              <FontAwesome5
+                                name="trash"
+                                size={15}
+                                color={"red"}
+                              />
+                            </TouchableOpacity>
                           </View>
                           <View style={styles.datesAndPayment}>
                             <View style={styles.PlansInfo}>
@@ -698,6 +819,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     padding: 20,
+    justifyContent: "space-between",
   },
   ImageName: {
     overflow: "hidden",
@@ -725,7 +847,7 @@ const styles = StyleSheet.create({
   UpperRightContainer: {
     display: "flex",
     flexDirection: "column",
-    paddingRight: 20,
+    // paddingRight: 20,
   },
 
   Details: {
@@ -737,7 +859,6 @@ const styles = StyleSheet.create({
   QuickAction: {
     display: "flex",
     flexDirection: "row",
-    marginLeft: 10,
     marginTop: 10,
     justifyContent: "space-between",
   },

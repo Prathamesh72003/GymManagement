@@ -18,6 +18,8 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import XLSX from "xlsx";
+import RNFS from "react-native-fs";
 
 const ProfileScreen = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
@@ -74,20 +76,61 @@ const ProfileScreen = ({ navigation }) => {
     navigation.replace("Login");
   };
 
-  if (initializing) {
-    return (
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          flex: 1,
-          backgroundColor: "#fff",
-        }}
-      >
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
+  const exportDataToExcel = async () => {
+    setInitializing(true);
+    // Created Sample data
+    // let sample_data_to_export = [
+    //   { id: "1", name: "First User" },
+    //   { id: "2", name: "Second User" },
+    // ];
+    const value = await AsyncStorage.getItem("GYM");
+
+    const members = await firestore()
+      .collection("GYM")
+      .doc(value)
+      .collection("MEMBERS")
+      .get();
+    var membersArray = members.docs;
+
+    var data = [];
+    membersArray.map((member) => {
+      data.push({
+        id: member._data.id,
+        name: member._data.name,
+        phone_no: member._data.phone_no,
+        email_id: member._data.email_id,
+        dob: member._data.dob,
+        address: member._data.address,
+        injury: member._data.injury,
+      });
+    });
+
+    let wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(wb, ws, "Users");
+    const wbout = XLSX.write(wb, { type: "binary", bookType: "xlsx" });
+
+    // Write generated excel to Storage
+    RNFS.writeFile(
+      RNFS.ExternalStorageDirectoryPath + "/Members - (Digi Eegistry).xlsx",
+      wbout,
+      "ascii"
+    )
+      .then((r) => {
+        ToastAndroid.show(
+          "File downloaded successfully! check in your file manager",
+          ToastAndroid.LONG
+        );
+      })
+      .catch((e) => {
+        ToastAndroid.show(
+          "Error occurred while downloading file " + e,
+          ToastAndroid.LONG
+        );
+        console.log("Error", e);
+      });
+    setInitializing(false);
+  };
 
   const share = async () => {
     try {
@@ -107,6 +150,21 @@ const ProfileScreen = ({ navigation }) => {
       alert(error.message);
     }
   };
+
+  if (initializing) {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView
@@ -262,6 +320,20 @@ const ProfileScreen = ({ navigation }) => {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
+                  exportDataToExcel();
+                }}
+              >
+                <View style={styles.listItem}>
+                  <View style={styles.Icon}>
+                    <FontAwesome5 name="download" size={22} color={"#2f50c9"} />
+                  </View>
+                  <View style={styles.ListTextContainer}>
+                    <Text style={styles.ListText}>Download members</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
                   share();
                 }}
               >
@@ -296,7 +368,9 @@ const ProfileScreen = ({ navigation }) => {
                     <FontAwesome5 name="question" size={22} color={"#2f50c9"} />
                   </View>
                   <View style={styles.ListTextContainer}>
-                    <Text style={styles.ListText}>How to use digi registry</Text>
+                    <Text style={styles.ListText}>
+                      How to use digi registry
+                    </Text>
                   </View>
                 </View>
               </TouchableOpacity>

@@ -24,38 +24,54 @@ const EditMember = ({ route, navigation }) => {
   const [userName, setUserName] = useState(data.name);
   const [email, setEmail] = useState(data.email_id);
   const [gender, setGender] = useState(data.gender);
-  const [phone, setPhone] = useState(data.phone_no);
+  const [phone, setPhone] = useState(
+    data.phone_no != null ? data.phone_no.slice(2) : ""
+  );
   const [address, setAddress] = useState(data.address);
 
-  const UpdateData = async() => {
-
+  const UpdateData = async () => {
     const value = await AsyncStorage.getItem("GYM");
 
     if (userName.trim() === "") {
       ToastAndroid.show("Username required", ToastAndroid.SHORT);
     } else {
-        try {
-            firestore()
-              .collection("GYM")
-              .doc(value)
-              .collection("MEMBERS")
-              .doc(data.id)
-              .update({
-                name: userName,
-                email_id: email,
-                gender: gender,
-                phone_no: phone,
-                address: address
-              })
-              .then(() => {
-                console.log("Member profile updated successfully!");
-                ToastAndroid.show("Member profile updated successfully!", ToastAndroid.LONG);
-                navigation.replace("Members")
-              });
-          } catch (error) {
-            console.log(error);
-          }
+      try {
+        firestore()
+          .collection("GYM")
+          .doc(value)
+          .collection("MEMBERS")
+          .doc(data.id)
+          .update({
+            name: userName,
+            email_id: email,
+            gender: gender,
+            phone_no: "91" + phone,
+            address: address,
+          })
+          .then(() => {
+            console.log("Member profile updated successfully!");
+            navigateToDetail();
+          });
+      } catch (error) {
+        console.log(error);
+      }
     }
+  };
+
+  const navigateToDetail = async () => {
+    const GYM_OWNER_EMAIL_ID = await AsyncStorage.getItem("GYM");
+
+    ToastAndroid.show(
+      "Member profile updated successfully!",
+      ToastAndroid.LONG
+    );
+    const member = await firestore()
+      .collection("GYM")
+      .doc(GYM_OWNER_EMAIL_ID)
+      .collection("MEMBERS")
+      .doc(data.id)
+      .get();
+    navigation.replace("MemberDetails", { data: member._data });
   };
 
   return (
@@ -150,7 +166,9 @@ const EditMember = ({ route, navigation }) => {
             </View>
             <TouchableOpacity
               style={styles.saveBtnContainer}
-              onPress={() => {UpdateData()}}
+              onPress={() => {
+                UpdateData();
+              }}
             >
               <View style={styles.saveBtn}>
                 <Text style={styles.saveBtnText}>Update</Text>

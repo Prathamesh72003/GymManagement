@@ -113,7 +113,7 @@ const AddMember = ({ navigation }) => {
   };
 
   const addMemberToDB = async () => {
-    if (name.length != 0 && emailID.length != 0 && phoneNO.length != 0) {
+    if (name.length != 0) {
       setStoreInDB(true);
       if (
         profileImg !=
